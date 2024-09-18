@@ -34,3 +34,4 @@ NODE_ENV=production npm run build
 ## Resources
 
 - Next.js docs: https://nextjs.org/docs/getting-started/installation
+- Auth0 walkthrough: https://auth0.com/docs/quickstart/webapp/nextjs/interactive

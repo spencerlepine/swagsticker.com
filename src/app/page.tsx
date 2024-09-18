@@ -8,6 +8,7 @@ export default function LandingPage() {
         <Image className="dark:invert" src="https://nextjs.org/icons/next.svg" alt="Next.js logo" width={180} height={38} priority />
 
         <PingBtn endpoint="/api/ping" title="Ping" />
+        <PingBtn endpoint="/api/ping-protected" title="Ping [protected]" />
         <p>secret: {process.env.MY_SECRET_VALUE}</p>
       </main>
     </div>
