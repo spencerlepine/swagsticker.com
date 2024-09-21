@@ -9,7 +9,11 @@ const Header: React.FC = () => {
   return (
     <header>
       <a href="/">SwagSticker</a>
-      {user ? <a href="/account">Account</a> : <a href="/api/auth/login">Login</a>}
+      <div>
+        <p>Searchbar</p>
+      </div>
+      {user ? <a href="/account">Account</a> : <a href="/api/auth/login">Sign in</a>}
+      <a href="/cart">Cart</a>
     </header>
   );
 };

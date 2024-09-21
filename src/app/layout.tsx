@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { UserProvider } from '@auth0/nextjs-auth0/client';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import localFont from 'next/font/local';
 import './globals.css';
 
@@ -30,7 +31,8 @@ export default function RootLayout({
       <UserProvider>
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
           <Header />
-          {children}
+          <main className="font-[family-name:var(--font-geist-sans)]">{children}</main>
+          <Footer />
         </body>
       </UserProvider>
     </html>
