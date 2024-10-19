@@ -1,36 +1,33 @@
 'use client';
 
-import React from 'react';
-// import { useRouter } from 'next/navigation';
+import { getProductById } from '@/lib/catalog';
+import { PRODUCT_CONFIG } from '@/lib/products';
+import { CartItem } from '@/types';
+import { useShoppingCart } from 'use-shopping-cart';
 
-const AddToCartBtn: React.FC<{ productSlug: string; size: string }> = ({ productSlug, size }) => {
-  // const router = useRouter();
+const AddToCartBtn: React.FC<{ productId: string; size: string; price: number }> = ({ productId, size, price }) => {
+  const { addItem } = useShoppingCart();
 
-  const handleAddtoCart = async () => {
-    alert('Added to cart!');
+  const handleAddtoCart = () => {
+    const product = getProductById(productId);
+    if (!product) return;
 
-    // TODO
-    // try {
-    //   const data = await fetch('/api/v1/cart', {
-    //     method: 'POST',
-    //     body: {
-    //       productSlug: productSlug,
-    //       size: size,
-    //     },
-    //   });
-    //   const response = await data.json();
-    //   if (response.status !== 200) {
-    //     return router.push('/api/auth/login');
-    //   }
-    //   const { message } = response;
-    //   console.log('POST /cart', response);
-    //   alert(message);
-    // } catch (err: unknown) {
-    //   alert('Requested failed, check the console.');
-    //   console.error(err);
-    // }
+    const cartItemId = `${productId}-${size}`;
+    const cartItem: CartItem = {
+      ...product,
+      id: cartItemId,
+      price: price,
+      currency: PRODUCT_CONFIG.currency,
+      product_data: { productId, size, category: product.category, type: product.type },
+    };
+    addItem(cartItem);
   };
-  return <button onClick={handleAddtoCart}>Add to Cart</button>;
+
+  return (
+    <button className="bg-blue-500 text-white px-4 py-2 rounded-md mt-4 w-full" onClick={handleAddtoCart}>
+      Add to Cart
+    </button>
+  );
 };
 
 export default AddToCartBtn;

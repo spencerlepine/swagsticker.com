@@ -1,18 +1,27 @@
-import React from 'react';
-import Product from '@/types/Product';
-import AddToCartBtn from './AddToCartBtn';
+import { DEFAULT_STICKER_SIZES } from '@/lib/products';
+import { formatPriceForDisplay } from '@/lib/stripe';
+import { Product } from '@/types';
 import Image from 'next/image';
 
 const ProductCard: React.FC<Product> = props => {
-  const { slug, title, thumbnailUrl, price, sizes } = props;
+  const { id, name, image, defaultSize } = props;
+
+  const stickerSize = defaultSize;
+  // @ts-expect-error - no risk, unit test will ensure product has 'defaultSize'
+  const stickerPrice = DEFAULT_STICKER_SIZES.find(item => item.value === stickerSize).price;
+  const price = formatPriceForDisplay(stickerPrice);
+
   return (
-    <div>
-      <a href={`/product/${slug}`}>
-        <p>{title}</p>
-        <Image alt={title} src={thumbnailUrl} width={100} height={100} />
-        <p>${price}</p>
+    <div className="bg-white rounded-lg overflow-hidden w-full max-w-[200px] mx-auto sm:max-w-[280px] md:max-w-[220px] min-w-52">
+      <a href={`/product/${id}`} className="block">
+        <div className="relative aspect-square">
+          <Image width={250} height={250} src={image} alt={name} className="hover:scale-105 transition-transform transition-opacity duration-300 ease-in-out hover:opacity-75" />
+        </div>
+        <div className="py-4">
+          <h3 className="text-md font-semibold text-gray-600 truncate">{name}</h3>
+          <p className="text-lg font-bold">From {price}</p>
+        </div>
       </a>
-      <AddToCartBtn productSlug={slug} size={sizes[0]} />
     </div>
   );
 };

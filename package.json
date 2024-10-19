@@ -1,24 +1,33 @@
 {
   "name": "swagsticker.com-demo",
   "author": "Spencer Lepine @spencerlepine",
-  "description": "Ecommerce store, a fullstack Next.js (App Router) application",
+  "description": "E-commerce store, a fullstack Next.js (App Router) application",
   "version": "0.0.0",
   "private": true,
   "engines": {
     "node": ">=18.17.0"
   },
+  "browserslist": [
+    "chrome 64",
+    "edge 79",
+    "firefox 67",
+    "opera 51",
+    "safari 12"
+  ],
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "test": "echo 'No tests added yet' && exit 0",
     "start": "next start",
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth0/nextjs-auth0": "^3.5.0",
+    "fuse.js": "^7.0.0",
     "next": "14.2.11",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "stripe": "^16.9.0",
+    "use-shopping-cart": "^3.2.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -36,8 +45,12 @@
   "eslintConfig": {
     "extends": [
       "next/core-web-vitals",
-      "next/typescript"
-    ]
+      "next/typescript",
+      "plugin:jsx-a11y/recommended"
+    ],
+    "rules": {
+      "@typescript-eslint/ban-ts-comment": "warn"
+    }
   },
   "prettier": {
     "printWidth": 180,

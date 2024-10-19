@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { UserProvider } from '@auth0/nextjs-auth0/client';
+import CartProvider from '@/providers/CartProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import localFont from 'next/font/local';
@@ -28,13 +28,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <UserProvider>
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-foreground bg-background font-sans text-balance flex flex-col h-screen `}>
+        <CartProvider>
           <Header />
-          <main className="font-[family-name:var(--font-geist-sans)]">{children}</main>
+          <main className="container mx-auto flex-grow font-[family-name:var(--font-geist-sans)]">{children}</main>
           <Footer />
-        </body>
-      </UserProvider>
+        </CartProvider>
+      </body>
     </html>
   );
 }
