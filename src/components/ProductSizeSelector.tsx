@@ -1,7 +1,7 @@
 'use client';
 
 import { Product, Size } from '@/types';
-import AddToCartBtn from './AddToCartBtn';
+import AddToCartBtn from '@/components/AddToCartBtn';
 import { formatPriceForDisplay } from '@/lib/stripe';
 import { useState } from 'react';
 import { DEFAULT_STICKER_SIZES } from '@/lib/products';

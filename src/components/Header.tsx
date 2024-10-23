@@ -1,12 +1,12 @@
 'use client';
 
-import SearchBar from './SearchBar';
+import SearchBar from '@/components/SearchBar';
 import { useShoppingCart } from 'use-shopping-cart';
 
 const Header: React.FC = () => {
   const { cartCount } = useShoppingCart();
 
-  // TODO_AUTH_ACCOUNT
+  // TODO_AUTH_ORDERS
   return (
     <header className="flex justify-between items-center px-4 py-2 bg-white shadow-md">
       <div className="container mx-auto flex justify-between items-center">

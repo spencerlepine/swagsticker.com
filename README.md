@@ -94,6 +94,16 @@ docker-compose -f ./docker/development docker-compose.yml up -d
 # visit http://locahost:3001
 ```
 
+### Local Stripe Webhook Testing
+
+```sh
+brew install stripe/stripe-cli/stripe
+stripe login
+stripe listen --forward-to localhost:3000/api/v1/webhook/checkout
+# *open separate terminal*
+stripe trigger checkout.session.completed --add checkout_session:metadata.printifyOrderId=123
+```
+
 ## License
 
 GNU General Public License v3.0 or later

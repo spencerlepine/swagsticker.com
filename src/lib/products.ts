@@ -1,6 +1,6 @@
 import { Product, Size } from '@/types';
 
-const STICKER_SIZES = {
+export const STICKER_SIZES = {
   TWO_BY_TWO_IN: '2x2in',
   THREE_BY_THREE_IN: '3x3in',
   FOUR_BY_FOUR_IN: '4x4in',

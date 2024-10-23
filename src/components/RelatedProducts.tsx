@@ -1,5 +1,5 @@
 import { getRelatedProductsByCategory } from '@/lib/catalog';
-import ProductCard from './ProductCard';
+import ProductCard from '@/components/ProductCard';
 import { Category } from '@/types';
 
 const RelatedProducts: React.FC<{ productId: string; category: Category }> = ({ productId, category }) => {

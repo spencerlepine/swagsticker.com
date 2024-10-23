@@ -26,6 +26,7 @@
     "next": "14.2.11",
     "react": "^18",
     "react-dom": "^18",
+    "sharp": "^0.33.5",
     "stripe": "^16.9.0",
     "use-shopping-cart": "^3.2.0"
   },

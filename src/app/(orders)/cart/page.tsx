@@ -1,42 +1,33 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import CartItemCard from '@/components/CartItemCard';
 import { formatPriceForDisplay } from '@/lib/stripe';
 import { useShoppingCart } from 'use-shopping-cart';
 import { CartItem } from '@/types';
 
 export default function CartPage() {
-  const {
-    cartCount,
-    cartDetails,
-    removeItem,
-    totalPrice,
-    // redirectToCheckout, // don't use this out-of-box, redirect with POST request from my route endpoint
-    addItem,
-    decrementItem,
-  } = useShoppingCart();
+  const router = useRouter();
+
+  const { cartCount, cartDetails, removeItem, totalPrice, addItem, decrementItem } = useShoppingCart();
   const cartItems = Object.values(cartDetails ?? {});
 
   async function handleCheckoutClick() {
-    alert('feature: work-in-progress');
-    // TODO_STRIPE
-    // if (cartCount && cartCount > 0) {
-    //   try {
-    //     const res = await fetch('/api/v1/checkout', {
-    //       method: 'POST',
-    //       body: JSON.stringify(cartDetails),
-    //     });
-    //     const data = await res.json();
-    //     // TODO_STRIPE - checkout redirect
-    //     // instead of useShoppingCart stripe, use our own stripe-js
-    //     const result = await redirectToCheckout(data.sessionId);
-    //     if (result?.error) {
-    //       console.error(result);
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
+    if (!cartCount || cartCount === 0) {
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/v1/checkout', {
+        method: 'POST',
+        body: JSON.stringify({ cartItems }),
+      });
+      const { checkoutUrl } = await res.json();
+      if (!checkoutUrl) return alert('Unable to checkout at this time. Please try again later.');
+      router.push(checkoutUrl);
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   const handleRemove = (cartItem: CartItem) => {
