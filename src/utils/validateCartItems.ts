@@ -107,7 +107,7 @@ export const validateCartItems = (cartItems: CartItem[]): CartItem[] => {
 
     return validCartItems;
   } catch (error) {
-    console.error('Cart validation error:', error);
+    console.error('[CartValidation] Unable to verify cart items:', error);
     return [];
   }
 };

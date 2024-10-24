@@ -13,6 +13,8 @@ export default function CartPage() {
   const cartItems = Object.values(cartDetails ?? {});
 
   async function handleCheckoutClick() {
+    // TODO_CHECKOUT - debounce click
+    // TODO_CHECKOUT - error message popup
     if (!cartCount || cartCount === 0) {
       return;
     }
@@ -26,7 +28,7 @@ export default function CartPage() {
       if (!checkoutUrl) return alert('Unable to checkout at this time. Please try again later.');
       router.push(checkoutUrl);
     } catch (error) {
-      console.error(error);
+      console.error('Checkout request threw an error', error);
     }
   }
 

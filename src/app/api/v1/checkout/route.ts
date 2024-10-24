@@ -1,3 +1,4 @@
+import { createDraftOrder, formatCartItemsForPrintify } from '@/lib/printify';
 import { createCheckoutSession, formatCartItemsForStripe } from '@/lib/stripe';
 import validateCartItems from '@/utils/validateCartItems';
 import { NextRequest, NextResponse } from 'next/server';
@@ -74,12 +75,17 @@ export const POST = async (request: NextRequest) => {
 
     const cartItems = validateCartItems(clientCartItems);
     if (!cartItems) {
-      console.error('[Checkout] invalid client cart', clientCartItems);
+      console.error('[Checkout] cart items are invalid', clientCartItems);
       return NextResponse.json({ message: 'Unable to checkout cart items' }, { status: 400 });
     }
 
-    // TODO_PRINTIFY
-    const printifyOrderId = 'asdf1234';
+    const printifyLineItems = formatCartItemsForPrintify(cartItems);
+    const { printifyOrderId } = await createDraftOrder(printifyLineItems);
+    if (!printifyOrderId) {
+      console.error('[Printify] unable to submit a Printify order');
+      return NextResponse.json({ message: 'Unable to checkout cart items' }, { status: 400 });
+    }
+
     const stripeLineItems = formatCartItemsForStripe(cartItems);
     const session = await createCheckoutSession(stripeLineItems, { printifyOrderId });
 
@@ -90,7 +96,7 @@ export const POST = async (request: NextRequest) => {
 
     return NextResponse.json({ checkoutUrl: session.url });
   } catch (error) {
-    console.error('Error processing request:', error);
+    console.error('[Checkout] Error processing checkout request:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 };

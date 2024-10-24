@@ -13,11 +13,13 @@ export const PRODUCT_CONFIG = {
   defaultSize: STICKER_SIZES.TWO_BY_TWO_IN,
 };
 
+// SPOKE Custom Products
+
 // hard-coded, based on cost per unit (Printify)
 export const STICKER_PRICES = {
-  [STICKER_SIZES.TWO_BY_TWO_IN]: 230,
-  [STICKER_SIZES.THREE_BY_THREE_IN]: 250,
-  [STICKER_SIZES.FOUR_BY_FOUR_IN]: 270,
+  [STICKER_SIZES.TWO_BY_TWO_IN]: 230, // $1.45 (whole sale) + $0.30 + 2% (stripe fee)
+  [STICKER_SIZES.THREE_BY_THREE_IN]: 250, // $1.61 (whole sale) + $0.30 + 2% (stripe fee)
+  [STICKER_SIZES.FOUR_BY_FOUR_IN]: 270, // $2.02 (whole sale) + $0.30 + 2% (stripe fee)
 };
 export const DEFAULT_STICKER_SIZES = [
   {

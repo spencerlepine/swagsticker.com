@@ -19,6 +19,7 @@ const AddToCartBtn: React.FC<{ productId: string; size: string; price: number }>
       price: price,
       currency: PRODUCT_CONFIG.currency,
       product_data: { productId, size, category: product.category, type: product.type },
+      quantity: 1,
     };
     addItem(cartItem);
   };

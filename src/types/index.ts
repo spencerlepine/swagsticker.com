@@ -34,7 +34,7 @@ export type CartItem = {
    * The description of the product
    */
   description: string;
-  quantity?: number;
+  quantity: number;
   /**
    * The price of the product
    */
@@ -65,4 +65,14 @@ export interface FetchProductsFilters {
 export interface PaginatedProducts {
   products: Product[];
   pageLimitIsReached: boolean;
+}
+
+export interface PrintifyLineItem {
+  print_provider_id: number;
+  blueprint_id: number;
+  variant_id: number; // Assuming variantIds has numeric keys for sticker sizes
+  print_areas: {
+    front: string;
+  };
+  quantity: number;
 }

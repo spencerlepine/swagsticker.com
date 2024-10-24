@@ -2763,6 +2763,11 @@ prettier@2.8.8:
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
   integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
 
+printify-sdk-js@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/printify-sdk-js/-/printify-sdk-js-1.0.1.tgz#38b6f799050f02dc70b89730f6542ae51211e1cc"
+  integrity sha512-4eE6tGzkHspT7R7zSWY4eD8AVQE0+qB+rZmRirIcbOQEDtO0A7zr01QlBWNMs1zFdKe2E5jB5nxz8EQoQSe01Q==
+
 prop-types@^15.7.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"

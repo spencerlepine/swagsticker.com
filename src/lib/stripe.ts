@@ -2,7 +2,8 @@ import Stripe from 'stripe';
 import { PRODUCT_CONFIG } from '@/lib/products';
 import { CartItem } from '@/types';
 
-// See your keys here: https://dashboard.stripe.com/apikeys
+// docs: https://docs.stripe.com
+// keys: https://dashboard.stripe.com/apikeys
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   // https://github.com/stripe/stripe-node#configuration
   apiVersion: '2024-06-20',
@@ -65,7 +66,7 @@ export async function createCheckoutSession(
     shipping_address_collection: {
       allowed_countries: PRODUCT_CONFIG.allowCountries as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
     },
-    // TODO_PRINTIFY - calculate this dynamically with Printify request
+    // TODO_PRINTIFY - calculate this dynamically with Printify request  + USD 0.09 per item!
     shipping_options: [
       {
         shipping_rate_data: {
@@ -87,26 +88,26 @@ export async function createCheckoutSession(
           },
         },
       },
-      {
-        shipping_rate_data: {
-          type: 'fixed_amount',
-          fixed_amount: {
-            amount: 429,
-            currency: 'usd',
-          },
-          display_name: 'Economy',
-          delivery_estimate: {
-            minimum: {
-              unit: 'business_day',
-              value: 4,
-            },
-            maximum: {
-              unit: 'business_day',
-              value: 8,
-            },
-          },
-        },
-      },
+      // {
+      //   shipping_rate_data: {
+      //     type: 'fixed_amount',
+      //     fixed_amount: {
+      //       amount: 429,
+      //       currency: 'usd',
+      //     },
+      //     display_name: 'Economy',
+      //     delivery_estimate: {
+      //       minimum: {
+      //         unit: 'business_day',
+      //         value: 4,
+      //       },
+      //       maximum: {
+      //         unit: 'business_day',
+      //         value: 8,
+      //       },
+      //     },
+      //   },
+      // },
     ],
     automatic_tax: {
       enabled: true, // Enable tax based on location
