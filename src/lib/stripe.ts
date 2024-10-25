@@ -60,7 +60,6 @@ export async function createCheckoutSession(
     mode: 'payment',
     success_url: `${process.env.NEXT_PUBLIC_URL}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${process.env.NEXT_PUBLIC_URL}/cart`,
-    // TODO_AUTH_ORDERS
     // customer: 'customerId',
     // customer_email: 'customer@gmail.com',
     shipping_address_collection: {
@@ -115,7 +114,6 @@ export async function createCheckoutSession(
   });
 }
 
-// TODO_AUTH_ORDERS
 export async function retrieveCheckoutSession(sessionId: string) {
   return await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ['line_items'],
@@ -129,8 +127,6 @@ export async function validateStripeSession(sessionId?: string) {
     const session = await retrieveCheckoutSession(sessionId);
 
     if (session.object !== 'checkout.session') return { validSession: false };
-
-    // TODO_AUTH_ORDERS - only this users' orders
 
     return { validSession: true };
   } catch (error) {

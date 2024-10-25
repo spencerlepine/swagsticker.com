@@ -1,5 +1,5 @@
 import Printify from 'printify-sdk-js';
-import { STICKER_SIZES } from '@/lib/products';
+import { retrieveStickerPNGFileUrl, STICKER_SIZES } from '@/lib/products';
 import { CartItem, PrintifyLineItem } from '@/types';
 
 // docs: https://developers.printify.com/
@@ -26,7 +26,7 @@ export const formatCartItemsForPrintify = (cartItems: CartItem[]): PrintifyLineI
     blueprint_id: PRINTIFY_BLUEPRINT_ID,
     variant_id: PRINTIFY_VARIANT_IDS[cartItem.product_data.size],
     print_areas: {
-      front: `${process.env.NEXT_PUBLIC_URL}${cartItem.image}`,
+      front: retrieveStickerPNGFileUrl(cartItem.product_data.productId),
     },
     quantity: cartItem.quantity,
   }));
@@ -42,12 +42,13 @@ export async function createDraftOrder(lineItems: PrintifyLineItem[]): Promise<{
     const orderData = {
       external_id: randomId,
       label: `shipment_${randomLabel}`,
+      // TODO_PRINTIFY (pull/format from stripe)
       line_items: lineItems,
       shipping_method: 1,
       is_printify_express: false,
       is_economy_shipping: false,
       send_shipping_notification: false,
-      // TODO_AUTH_ORDER
+      // TODO_PRINTIFY (pull address from stripe)
       address_to: {
         first_name: 'John',
         last_name: 'Doe',

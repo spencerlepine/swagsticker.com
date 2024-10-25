@@ -79,6 +79,7 @@ export const POST = async (request: NextRequest) => {
       return NextResponse.json({ message: 'Unable to checkout cart items' }, { status: 400 });
     }
 
+    // TODO_PRINTIFY (move this to final webhook)
     const printifyLineItems = formatCartItemsForPrintify(cartItems);
     const { printifyOrderId } = await createDraftOrder(printifyLineItems);
     if (!printifyOrderId) {

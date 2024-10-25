@@ -45,6 +45,10 @@ const stickerDescription = `
 - Items are typically shipped within 2-5 business days.
 `;
 
+// source: https://github.com/spencerlepine/swagsticker.com-prod/tree/assets
+const STICKER_PNG_ASSETS_BASE_URL = 'https://github.com/spencerlepine/swagsticker.com/raw/refs/heads/assets/pngs';
+export const retrieveStickerPNGFileUrl = (productSlug: string) => `${STICKER_PNG_ASSETS_BASE_URL}/${productSlug}.png`;
+
 export const STICKER_PRODUCTS: Product[] = [
   {
     id: 'airtable',

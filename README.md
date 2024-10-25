@@ -61,6 +61,7 @@ https://github.com/jadiaheno/vention-machine-cloud-test/assets/13062328/a42d55bb
 
 - **Node.js** installed on your machine (download [here](https://nodejs.org/en/download))
 - Stripe developer account (+ API keys)
+- `stripe-cli` (`$ brew install stripe/stripe-cli/stripe`)
 - Printify developer account (+ API keys)
 
 #### Installation
@@ -75,7 +76,25 @@ npm install
 #### Run Locally
 
 ```sh
+stripe login
+stripe listen --forward-to localhost:3000/api/v1/webhook/checkout
+
+# *open separate terminal*
+
 npm run dev
+# visit http://locahost:3000
+```
+
+#### Local Docker Container
+
+```sh
+stripe login
+stripe listen --forward-to localhost:3000/api/v1/webhook/checkout
+
+# *open separate terminal*
+
+cp .env.template .env.development
+docker-compose -f ./docker/development/docker-compose.yml --env-file .env.development up -d
 # visit http://locahost:3000
 ```
 
@@ -84,24 +103,6 @@ npm run dev
 ```sh
 cp .env.template .env.production
 npm run build
-```
-
-#### Local Docker Container
-
-```sh
-cp .env.template .env.development
-docker-compose -f ./docker/development docker-compose.yml up -d
-# visit http://locahost:3001
-```
-
-### Local Stripe Webhook Testing
-
-```sh
-brew install stripe/stripe-cli/stripe
-stripe login
-stripe listen --forward-to localhost:3000/api/v1/webhook/checkout
-# *open separate terminal*
-stripe trigger checkout.session.completed --add checkout_session:metadata.printifyOrderId=123
 ```
 
 ## License
