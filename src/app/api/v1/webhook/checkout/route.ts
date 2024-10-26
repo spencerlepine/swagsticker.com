@@ -1,24 +1,14 @@
 import type { Stripe as StripeType } from 'stripe';
-import { retrieveCheckoutSession, stripe } from '@/lib/stripe';
+import { stripe } from '@/lib/stripe';
 import { NextRequest, NextResponse } from 'next/server';
-import { sendOrderToProduction } from '@/lib/printify';
 import logger from '@/lib/logger';
+import { createDraftOrder } from '@/lib/printify';
 
 export const POST = async (request: NextRequest) => {
-  const correlationId = request.headers.get('x-correlation-id');
-
   try {
-    logger.info('[Stripe Webhook] Processing Stripe webhook request');
-
-    const secret = process.env.STRIPE_WEBHOOK_SECRET || '';
-    if (!secret) {
-      logger.error('[Stripe Webhook] Missing STRIPE_WEBHOOK_SECRET environment variable');
-      throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable');
-    }
-
     const body = await (await request.blob()).text();
     const signature = request.headers.get('stripe-signature') as string;
-    const event: StripeType.Event = stripe.webhooks.constructEvent(body, signature, secret);
+    const event: StripeType.Event = stripe.webhooks.constructEvent(body, signature, process.env.STRIPE_WEBHOOK_SECRET as string);
 
     const permittedEvents: string[] = ['checkout.session.completed', 'payment_intent.succeeded', 'payment_intent.payment_failed'];
     if (permittedEvents.includes(event.type)) {
@@ -27,45 +17,49 @@ export const POST = async (request: NextRequest) => {
       switch (event.type) {
         case 'checkout.session.completed':
           data = event.data.object as StripeType.Checkout.Session;
+          logger.info('[Stripe Webhook] Checkout succeeded', { eventType: event.type, sessionId: data.id, eventId: event.id });
 
-          const printifyOrderId = event.data.object?.metadata?.printifyOrderId;
-          if (!printifyOrderId) {
-            logger.warn(`[Stripe Webhook] Missing printifyOrderId in metadata for session ${data.id}. Unable to fullfil order`, { sessionId: data.id, correlationId });
-            throw new Error(`missing printifyOrderId on metadata, ${data.id}`);
+          logger.info('[Stripe Webhook] Retrieving line_items', { sessionId: data.id });
+          const line_items = await stripe.checkout.sessions.listLineItems(data.id, {
+            expand: ['data.price.product'],
+          });
+          const email = data?.customer_details?.email || '';
+          const phone = data?.customer_details?.phone || '';
+
+          const swagOrderId = data.metadata?.swagOrderId;
+          if (!swagOrderId) {
+            logger.warn(`[Stripe Webhook] Missing swagOrderId in metadata for session ${data.id}. Unable to fullfil order`, { sessionId: data.id, eventId: event.id });
+            throw new Error(`missing swagOrderId on metadata, ${data.id}`);
           }
 
-          logger.info('[Stripe Webhook] Verifying payment status for Checkout Session', { sessionId: data.id, correlationId });
-          const checkoutSession = await retrieveCheckoutSession(data.id);
-          if (checkoutSession.payment_status === 'unpaid') {
-            logger.warn('[Stripe Webhook] Cannot fulfill an unpaid order', { sessionId: data.id, correlationId });
-            return NextResponse.json({ message: 'Cannot fullfil an unpaid order' }, { status: 400 });
-          }
+          logger.info('[Printify] Creating Printify draft order');
+          const { id: printifyOrderId } = await createDraftOrder(line_items.data, data.shipping_details, swagOrderId, data.id, email, phone);
 
-          logger.info('[Printify] Sending order to production', { sessionId: data.id, correlationId, printifyOrderId });
-          await sendOrderToProduction(printifyOrderId);
+          await new Promise(r => setTimeout(r, 3000));
 
-          logger.info('[Stripe Webhook] Successfully fulfilled order', { sessionId: data.id, correlationId, printifyOrderId });
-          return NextResponse.json({ result: event, ok: true });
+          // TODO_PRINTIFY - validate publish endpoint! - curl request always works..
+          logger.info('[Printify] Fullfilling order', { eventType: event.type, sessionId: data.id, printifyOrderId, eventId: event.id });
+          // await sendOrderToProduction(printifyOrderId);
+          break;
 
         case 'payment_intent.payment_failed':
           data = event.data.object as StripeType.PaymentIntent;
-          logger.error('[Stripe Webhook] Payment failed', { message: data.last_payment_error?.message, sessionId: data.id });
+          logger.error('[Stripe Webhook] Payment failed', { message: data.last_payment_error?.message, eventType: event.type, sessionId: data.id, eventId: event.id });
           break;
 
         case 'payment_intent.succeeded':
           data = event.data.object as StripeType.PaymentIntent;
-          logger.info('[Stripe Webhook] PaymentIntent succeeded', { status: data.status, sessionId: data.id });
+          logger.info('[Stripe Webhook] PaymentIntent succeeded', { eventType: event.type, status: data.status, sessionId: data.id, eventId: event.id });
           break;
 
         default:
+          // fallback, not used
           data = (event.data.object as unknown) || {};
-          // @ts-expect-error - ignore "Property 'id' does not exist on type '{}'.ts(2339)"
-          logger.warn('[Stripe Webhook] Unhandled event type', { eventType: event.type, sessionId: data?.id });
           return NextResponse.json({ result: event, ok: true });
       }
     }
 
-    logger.info('[Stripe Webhook] Webhook processing complete', { eventId: event.id });
+    logger.info('[Stripe Webhook] Processed request', { eventType: event.type });
     return NextResponse.json({ result: event, ok: true });
   } catch (error) {
     logger.error('[Stripe Webhook] Error processing webhook request', { error });

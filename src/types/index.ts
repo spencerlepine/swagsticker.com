@@ -100,3 +100,55 @@ export interface SubmitOrderData {
   send_shipping_notification: boolean;
   address_to: PrintifyAddress;
 }
+
+export interface PrintifyShippingProfile {
+  variant_ids: number[];
+  first_item: {
+    cost: number;
+    currency: string;
+  };
+  additional_items: {
+    cost: number;
+    currency: string;
+  };
+  countries: string[];
+}
+
+export interface VariantShippingData {
+  profiles: PrintifyShippingProfile[];
+}
+
+export interface StripeShippingMethod {
+  shipping_rate_data: {
+    type: 'fixed_amount';
+    fixed_amount: {
+      amount: number;
+      currency: string; // Assuming PRODUCT_CONFIG.currency is of type string
+    };
+    display_name: string;
+    delivery_estimate: {
+      minimum: {
+        unit: 'business_day'; // You could also make this a union type if there are other units
+        value: number;
+      };
+      maximum: {
+        unit: 'business_day'; // Same as above
+        value: number;
+      };
+    };
+  };
+}
+
+interface Address {
+  city: string;
+  country: string;
+  line1: string;
+  line2?: string;
+  postal_code: string;
+  state: string;
+}
+
+export interface StripeShippingDetails {
+  address: Address;
+  name: string;
+}

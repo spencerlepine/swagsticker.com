@@ -1,6 +1,7 @@
 import Printify from 'printify-sdk-js';
-import { retrieveStickerPNGFileUrl, STICKER_SIZES } from '@/lib/products';
-import { CartItem, PrintifyLineItem, SubmitOrderData } from '@/types';
+import { PRODUCT_CONFIG, retrieveStickerPNGFileUrl, STICKER_SIZES } from '@/lib/products';
+import { PrintifyLineItem, PrintifyShippingProfile, StripeShippingDetails, SubmitOrderData, VariantShippingData } from '@/types';
+import type { Stripe as StripeType } from 'stripe';
 import logger from './logger';
 
 // docs: https://developers.printify.com/
@@ -21,53 +22,86 @@ const PRINTIFY_VARIANT_IDS = {
   [STICKER_SIZES.FOUR_BY_FOUR_IN]: 95745,
 };
 
-export const formatCartItemsForPrintify = (cartItems: CartItem[]): PrintifyLineItem[] => {
-  return cartItems.map(cartItem => ({
+// export const formatCartItemsForPrintify = (cartItems: CartItem[]): PrintifyLineItem[] => {
+//   return cartItems.map(cartItem => ({
+//     print_provider_id: PRINTIFY_PRINT_PROVIDER_ID,
+//     blueprint_id: PRINTIFY_BLUEPRINT_ID,
+//     variant_id: PRINTIFY_VARIANT_IDS[cartItem.product_data.size],
+//     print_areas: {
+//       front: retrieveStickerPNGFileUrl(cartItem.product_data.productId),
+//     },
+//     quantity: cartItem.quantity,
+//   }));
+// };
+
+export const formatCartItemsForPrintify = (lineItems: StripeType.LineItem[]): PrintifyLineItem[] => {
+  return lineItems.map(item => ({
     print_provider_id: PRINTIFY_PRINT_PROVIDER_ID,
     blueprint_id: PRINTIFY_BLUEPRINT_ID,
-    variant_id: PRINTIFY_VARIANT_IDS[cartItem.product_data.size],
+    // @ts-expect-error - metadata is valid, hard to find stripe type tho
+    variant_id: PRINTIFY_VARIANT_IDS[item.price?.product?.metadata?.size],
     print_areas: {
-      front: retrieveStickerPNGFileUrl(cartItem.product_data.productId),
+      // @ts-expect-error - metadata is valid, hard to find stripe type tho
+      front: retrieveStickerPNGFileUrl(item.price?.product?.metadata?.productId),
     },
-    quantity: cartItem.quantity,
+    quantity: item.quantity || 1,
   }));
 };
 
-export async function createDraftOrder(cartItems: CartItem[]): Promise<{ id: string }> {
-  logger.info('[Printify] Formatting cart items for Printify');
+const formatStripeAddress = (stripeAddress: StripeShippingDetails, email: string | null, phone: string | null) => ({
+  first_name: stripeAddress.name.split(' ')[0],
+  last_name: stripeAddress.name.split(' ')[1],
+  email: email || 'placeholder@gmail.com',
+  phone: phone || '0574 69 21 90',
+  country: stripeAddress.address.country,
+  region: stripeAddress.address.state,
+  // state: stripeAddress.address.state, // Printify is European startup, they don't use "state"
+  address1: stripeAddress.address.line1,
+  address2: stripeAddress.address.line2,
+  city: stripeAddress.address.city,
+  zip: stripeAddress.address.postal_code,
+});
+
+export async function createDraftOrder(
+  cartItems: StripeType.LineItem[],
+  stripeShippingDetails: StripeType.Checkout.Session.ShippingDetails | null,
+  swagOrderId: string,
+  stripeSessionId: string,
+  email: string | null,
+  phone: string | null
+): Promise<{ id: string }> {
   const printifyLineItems: PrintifyLineItem[] = formatCartItemsForPrintify(cartItems);
-
-  const randomId = crypto.randomUUID();
-  const randomLabel = Math.floor(Math.random() * 100000)
-    .toString()
-    .padStart(5, '0');
-
+  console.log(printifyLineItems);
+  const address = formatStripeAddress(stripeShippingDetails as StripeShippingDetails, email, phone);
   const orderData: SubmitOrderData = {
-    external_id: randomId,
-    label: `shipment_${randomLabel}`,
-    // TODO_PRINTIFY (pull/format from stripe)
+    external_id: stripeSessionId,
+    label: `swagOrderId_${swagOrderId}`,
     line_items: printifyLineItems,
     shipping_method: 1,
     is_printify_express: false,
     is_economy_shipping: false,
-    send_shipping_notification: false,
-    // TODO_PRINTIFY (pull address from stripe)
-    address_to: {
-      first_name: 'John',
-      last_name: 'Doe',
-      email: 'testing@beta.com',
-      phone: '0574 69 21 90',
-      country: 'BE',
-      region: '',
-      address1: 'ExampleBaan 121',
-      address2: '45',
-      city: 'Retie',
-      zip: '2470',
-    },
+    send_shipping_notification: true,
+    address_to: address,
   };
 
   const order = await printify.orders.submit(orderData);
   return order;
+}
+
+export async function retrieveShippingCost(): Promise<PrintifyShippingProfile> {
+  logger.info('[Printify] retrieving shipping options');
+  const shipping: VariantShippingData = await printify.catalog.getVariantShipping(PRINTIFY_BLUEPRINT_ID.toString(), PRINTIFY_PRINT_PROVIDER_ID.toString());
+
+  const fallbackShippingOptions = {
+    variant_ids: [95743, 95744, 95745, 95746],
+    first_item: { cost: 509, currency: 'USD' },
+    additional_items: { cost: 9, currency: 'USD' },
+    countries: ['US'],
+  };
+
+  // US-only
+  // 1 option, "Standard" only
+  return shipping.profiles.find(profile => profile.countries.includes(PRODUCT_CONFIG.allowCountries[0])) || fallbackShippingOptions;
 }
 
 export async function sendOrderToProduction(printifyOrderId: string) {

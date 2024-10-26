@@ -7,6 +7,7 @@ export const STICKER_SIZES = {
 };
 
 export const PRODUCT_CONFIG = {
+  // US-only
   language: 'en-US',
   allowCountries: ['US'], // e.g. ['US', 'GB', 'CA'];
   currency: 'USD',
