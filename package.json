@@ -16,8 +16,8 @@
   ],
   "scripts": {
     "dev": "next dev",
-    "build": "NODE_ENV=production next build && npm run copy:assets",
-    "comment": "TODO_DEPLOYMENT - serve assets from CDN instead",
+    "build": "NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production next build && npm run copy:assets",
+    "comment": "TODO_OPTIMIZATION - serve assets from CDN instead",
     "copy:assets": "cp -rn public .next/standalone && cp -rn .next/static .next/standalone/.next/static",
     "test": "echo 'No tests added yet' && exit 0",
     "start": "node .next/standalone/server.js",
@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^2.8.1",
+    "@stripe/stripe-js": "^4.9.0",
     "fuse.js": "^7.0.0",
     "next": "14.2.11",
     "printify-sdk-js": "1.0.2",

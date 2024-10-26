@@ -1,0 +1,83 @@
+# TODO_PRODUCTION_SERVER
+
+# $ docker-compose -f ./docker/docker-compose.prod.yml --env-file .env.production up --build
+# visit http://localhost
+
+services:
+  # Watchtower: tool for pull-based continuous deployment
+  watchtower:
+    image: containrrr/watchtower
+    command:
+      - "--label-enable"
+      - "--interval"
+      - "30"
+      - "--rolling-restart"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  reverse-proxy:
+    image: traefik:v3.1
+    command:
+      - "--log.level=ERROR"
+      - "--accesslog=true"
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.myresolver.acme.email=spencer.sayhello@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entryPoints.web.forwardedHeaders.insecure"
+      - "--entryPoints.websecure.forwardedHeaders.insecure"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock
+  server:
+    # image: ghcr.io/spencerlepine/server:prod
+    build:
+      context: ../
+      dockerfile: docker/Dockerfile
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.server-ratelimit.ratelimit.average=20"
+      - "traefik.http.routers.server.rule=Host(`swagsticker.com`) && !Method(`POST`)"
+      - "traefik.http.routers.server.entrypoints=websecure"
+      - "traefik.http.routers.server.tls.certresolver=myresolver"
+      - "traefik.http.services.server.loadbalancer.server.port=3000" # forward to Next.js port
+      - "traefik.http.routers.server.middlewares=server-ratelimit"
+      # Define separate router for POST methods
+      - "traefik.http.middlewares.server-ratelimit-post.ratelimit.average=1"
+      - "traefik.http.middlewares.server-ratelimit-post.ratelimit.period=1m"
+      - "traefik.http.routers.server-post.rule=Host(`swagsticker.com`) && Method(`POST`)"
+      - "traefik.http.routers.server-post.middlewares=server-ratelimit-post"
+      - "traefik.http.routers.server-post.entrypoints=websecure"
+      - "traefik.http.routers.server-post.tls.certresolver=myresolver"
+      # Enable watchtower
+      - "com.centurylinklabs.watchtower.enable=true"
+    deploy:
+      mode: replicated
+      replicas: 3
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 1m30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  dragonfly:
+    image: 'docker.dragonflydb.io/dragonflydb/dragonfly'
+    ulimits:
+      memlock: -1
+    network_mode: "host"
+    volumes:
+      - dragonflydata:/data
+
+volumes:
+  db-data:
+  letsencrypt:
+  dragonflydata:

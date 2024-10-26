@@ -1,0 +1,42 @@
+# TODO_PRODUCTION_SERVER
+
+name: Manually Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  #bootstrap: 
+    # run bootstrap.ssh?
+    # PUBLIC_KEY="your_ssh_public_key_here" DOMAIN="your_domain_here" bash bootstrap.sh
+
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:      
+      - name: Re-deploy, update secrets
+        env:
+          # secure: only stored in memory during the remote-ssh session
+          API_KEY: ${{ secrets.API_KEY }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          ssh user@your-vm-ip << 'EOF'
+            # Authenticate with GitHub CLI using the passed PAT
+            echo "$GITHUB_TOKEN" | gh auth login --with-token
+          
+            # Create the .env file with secrets
+            {
+              echo "API_KEY=$API_KEY"
+              echo "DB_PASSWORD=$DB_PASSWORD"
+            } > .env
+          
+            # Run docker-compose with the .env file
+            docker-compose --env-file .env up -d
+
+            # Remove the .env file immediately
+            rm .env
+          EOF

@@ -35,8 +35,6 @@ export const POST = async (request: NextRequest) => {
           logger.info('[Printify] Creating Printify draft order');
           const { id: printifyOrderId } = await createDraftOrder(line_items.data, data.shipping_details, swagOrderId, data.id, email, phone);
 
-          await new Promise(r => setTimeout(r, 3000));
-
           // TODO_PRINTIFY - validate publish endpoint! - curl request always works..
           logger.info('[Printify] Fullfilling order', { eventType: event.type, sessionId: data.id, printifyOrderId, eventId: event.id });
           // await sendOrderToProduction(printifyOrderId);
