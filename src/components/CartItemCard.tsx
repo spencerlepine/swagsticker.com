@@ -1,4 +1,4 @@
-import { formatPriceForDisplay } from '@/lib/stripe';
+import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { CartItem } from '@/types';
 import Image from 'next/image';
 

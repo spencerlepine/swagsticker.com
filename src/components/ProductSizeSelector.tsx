@@ -2,7 +2,7 @@
 
 import { Product, Size } from '@/types';
 import AddToCartBtn from '@/components/AddToCartBtn';
-import { formatPriceForDisplay } from '@/lib/stripe';
+import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { useState } from 'react';
 import { DEFAULT_STICKER_SIZES } from '@/lib/products';
 

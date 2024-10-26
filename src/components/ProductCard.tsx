@@ -1,5 +1,5 @@
 import { DEFAULT_STICKER_SIZES } from '@/lib/products';
-import { formatPriceForDisplay } from '@/lib/stripe';
+import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { Product } from '@/types';
 import Image from 'next/image';
 

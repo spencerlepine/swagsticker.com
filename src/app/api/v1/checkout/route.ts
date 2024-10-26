@@ -1,5 +1,7 @@
-import { createDraftOrder, formatCartItemsForPrintify } from '@/lib/printify';
-import { createCheckoutSession, formatCartItemsForStripe } from '@/lib/stripe';
+import logger from '@/lib/logger';
+import { createDraftOrder } from '@/lib/printify';
+import { createCheckoutSession } from '@/lib/stripe';
+import { UserError } from '@/utils/errors';
 import validateCartItems from '@/utils/validateCartItems';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -69,35 +71,34 @@ import { NextRequest, NextResponse } from 'next/server';
  *                   type: string
  */
 export const POST = async (request: NextRequest) => {
+  const correlationId = request.headers.get('x-correlation-id');
+
   try {
+    logger.info('[Checkout] Processing checkout request', { correlationId });
+
     const body = await request.json();
     const { cartItems: clientCartItems } = body;
 
+    logger.info('[Checkout] Validating cart items', { correlationId });
     const cartItems = validateCartItems(clientCartItems);
-    if (!cartItems) {
-      console.error('[Checkout] cart items are invalid', clientCartItems);
-      return NextResponse.json({ message: 'Unable to checkout cart items' }, { status: 400 });
-    }
 
     // TODO_PRINTIFY (move this to final webhook)
-    const printifyLineItems = formatCartItemsForPrintify(cartItems);
-    const { printifyOrderId } = await createDraftOrder(printifyLineItems);
-    if (!printifyOrderId) {
-      console.error('[Printify] unable to submit a Printify order');
-      return NextResponse.json({ message: 'Unable to checkout cart items' }, { status: 400 });
-    }
+    logger.info('[Printify] Creating Printify draft order', { correlationId });
+    const { id: printifyOrderId } = await createDraftOrder(cartItems);
 
-    const stripeLineItems = formatCartItemsForStripe(cartItems);
-    const session = await createCheckoutSession(stripeLineItems, { printifyOrderId });
+    // TODO_PRINTIFY (calulateShipping())
 
-    if (!session || !session.url) {
-      console.error('[Stripe] error creating checkout session:', session);
-      return NextResponse.json({ message: 'Unable to create Stripe checkout session' }, { status: 400 });
-    }
+    logger.info('[Stripe] Creating checkout session', { correlationId, printifyOrderId });
+    const session = await createCheckoutSession(cartItems, { printifyOrderId });
 
+    logger.info('[Checkout] Checkout session created successfully', { checkoutUrl: session.url, correlationId, printifyOrderId, sessionId: session.id });
     return NextResponse.json({ checkoutUrl: session.url });
   } catch (error) {
-    console.error('[Checkout] Error processing checkout request:', error);
+    if (error instanceof UserError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+
+    logger.error('[Checkout] Error processing checkout request', { error });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 };

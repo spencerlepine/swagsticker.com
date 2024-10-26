@@ -2,11 +2,17 @@ import type { Stripe as StripeType } from 'stripe';
 import { retrieveCheckoutSession, stripe } from '@/lib/stripe';
 import { NextRequest, NextResponse } from 'next/server';
 import { sendOrderToProduction } from '@/lib/printify';
+import logger from '@/lib/logger';
 
 export const POST = async (request: NextRequest) => {
+  const correlationId = request.headers.get('x-correlation-id');
+
   try {
+    logger.info('[Stripe Webhook] Processing Stripe webhook request');
+
     const secret = process.env.STRIPE_WEBHOOK_SECRET || '';
     if (!secret) {
+      logger.error('[Stripe Webhook] Missing STRIPE_WEBHOOK_SECRET environment variable');
       throw new Error('Missing STRIPE_WEBHOOK_SECRET environment variable');
     }
 
@@ -24,40 +30,45 @@ export const POST = async (request: NextRequest) => {
 
           const printifyOrderId = event.data.object?.metadata?.printifyOrderId;
           if (!printifyOrderId) {
+            logger.warn(`[Stripe Webhook] Missing printifyOrderId in metadata for session ${data.id}. Unable to fullfil order`, { sessionId: data.id, correlationId });
             throw new Error(`missing printifyOrderId on metadata, ${data.id}`);
           }
 
-          // Make sure fulfillment hasn't already been preformed for this Checkout Session
+          logger.info('[Stripe Webhook] Verifying payment status for Checkout Session', { sessionId: data.id, correlationId });
           const checkoutSession = await retrieveCheckoutSession(data.id);
           if (checkoutSession.payment_status === 'unpaid') {
-            console.error('[Stripe] Webhook error: Cannot fullfil an unpaid order');
+            logger.warn('[Stripe Webhook] Cannot fulfill an unpaid order', { sessionId: data.id, correlationId });
             return NextResponse.json({ message: 'Cannot fullfil an unpaid order' }, { status: 400 });
           }
 
-          const { success } = await sendOrderToProduction(printifyOrderId);
-          if (!success) {
-            console.error('[Printify] unable to publish Printify order');
-            return NextResponse.json({ message: 'Unable to checkout cart items' }, { status: 400 });
-          }
+          logger.info('[Printify] Sending order to production', { sessionId: data.id, correlationId, printifyOrderId });
+          await sendOrderToProduction(printifyOrderId);
 
+          logger.info('[Stripe Webhook] Successfully fulfilled order', { sessionId: data.id, correlationId, printifyOrderId });
           return NextResponse.json({ result: event, ok: true });
+
         case 'payment_intent.payment_failed':
           data = event.data.object as StripeType.PaymentIntent;
-          console.error(`[Stripe Webhook Event] ❌ Payment failed: ${data.last_payment_error?.message}`);
+          logger.error('[Stripe Webhook] Payment failed', { message: data.last_payment_error?.message, sessionId: data.id });
           break;
+
         case 'payment_intent.succeeded':
           data = event.data.object as StripeType.PaymentIntent;
-          console.info(`[Stripe Webhook Event] 💰 PaymentIntent status: ${data.status}`);
+          logger.info('[Stripe Webhook] PaymentIntent succeeded', { status: data.status, sessionId: data.id });
           break;
+
         default:
-          console.warn(`[Stripe Webhook Event] Unhandled event: ${event.type}`);
+          data = (event.data.object as unknown) || {};
+          // @ts-expect-error - ignore "Property 'id' does not exist on type '{}'.ts(2339)"
+          logger.warn('[Stripe Webhook] Unhandled event type', { eventType: event.type, sessionId: data?.id });
           return NextResponse.json({ result: event, ok: true });
       }
     }
 
+    logger.info('[Stripe Webhook] Webhook processing complete', { eventId: event.id });
     return NextResponse.json({ result: event, ok: true });
   } catch (error) {
-    console.error('[Stripe] Error processing webhook request:', error);
+    logger.error('[Stripe Webhook] Error processing webhook request', { error });
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 };

@@ -1,6 +1,8 @@
 import Stripe from 'stripe';
 import { PRODUCT_CONFIG } from '@/lib/products';
 import { CartItem } from '@/types';
+import logger from './logger';
+import { UserError } from '@/utils/errors';
 
 // docs: https://docs.stripe.com
 // keys: https://dashboard.stripe.com/apikeys
@@ -12,15 +14,6 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
     url: process.env.NEXT_PUBLIC_URL as string,
   },
 });
-
-export const formatPriceForDisplay = (amount: number = 0): string => {
-  const numberFormat = new Intl.NumberFormat([PRODUCT_CONFIG.language], {
-    style: 'currency',
-    currency: PRODUCT_CONFIG.currency,
-    currencyDisplay: 'symbol',
-  });
-  return numberFormat.format(amount / 100);
-};
 
 export const formatCartItemsForStripe = (cartItems: CartItem[]): Stripe.Checkout.SessionCreateParams.LineItem[] => {
   return cartItems.map(cartItem => {
@@ -50,12 +43,12 @@ export const formatCartItemsForStripe = (cartItems: CartItem[]): Stripe.Checkout
 };
 
 // docs: https://docs.stripe.com/api/checkout/sessions/create
-export async function createCheckoutSession(
-  lineItems: Stripe.Checkout.SessionCreateParams.LineItem[],
-  metadata: { [key: string]: string } = {}
-): Promise<Stripe.Response<Stripe.Checkout.Session>> {
-  return stripe.checkout.sessions.create({
-    line_items: lineItems,
+export async function createCheckoutSession(cartItems: CartItem[], metadata: { [key: string]: string } = {}): Promise<Stripe.Response<Stripe.Checkout.Session>> {
+  logger.info('[Stripe] Formatting cart items for Stripe');
+  const stripeLineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = formatCartItemsForStripe(cartItems);
+
+  const session = await stripe.checkout.sessions.create({
+    line_items: stripeLineItems,
     metadata: metadata,
     mode: 'payment',
     success_url: `${process.env.NEXT_PUBLIC_URL}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
@@ -112,12 +105,26 @@ export async function createCheckoutSession(
       enabled: true, // Enable tax based on location
     },
   });
+
+  if (!session || !session.url) {
+    logger.error('[Stripe] Error creating checkout session', { session });
+    throw new UserError('Unable to process checkout request');
+  }
+
+  return session;
 }
 
 export async function retrieveCheckoutSession(sessionId: string) {
-  return await stripe.checkout.sessions.retrieve(sessionId, {
+  const session = await stripe.checkout.sessions.retrieve(sessionId, {
     expand: ['line_items'],
   });
+
+  if (!session) {
+    logger.error('[Stripe] Failed to process stripe checkout session');
+    throw new UserError('Unable to process stripe checkout session');
+  }
+
+  return session;
 }
 
 export async function validateStripeSession(sessionId?: string) {

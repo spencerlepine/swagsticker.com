@@ -76,3 +76,27 @@ export interface PrintifyLineItem {
   };
   quantity: number;
 }
+
+interface PrintifyAddress {
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  country: string;
+  region: string; // optional
+  address1: string;
+  address2?: string; // optional
+  city: string;
+  zip: string;
+}
+
+export interface SubmitOrderData {
+  external_id: string;
+  label: string;
+  line_items: PrintifyLineItem[];
+  shipping_method: number;
+  is_printify_express: boolean;
+  is_economy_shipping: boolean;
+  send_shipping_notification: boolean;
+  address_to: PrintifyAddress;
+}

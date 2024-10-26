@@ -1,7 +1,7 @@
 'use client';
 
 import CartItemCard from '@/components/CartItemCard';
-import { formatPriceForDisplay } from '@/lib/stripe';
+import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { useShoppingCart } from 'use-shopping-cart';
 import { CartItem } from '@/types';
 import CheckoutButton from '@/components/CheckoutBtn';

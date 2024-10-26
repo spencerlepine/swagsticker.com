@@ -1,6 +1,7 @@
 import Printify from 'printify-sdk-js';
 import { retrieveStickerPNGFileUrl, STICKER_SIZES } from '@/lib/products';
-import { CartItem, PrintifyLineItem } from '@/types';
+import { CartItem, PrintifyLineItem, SubmitOrderData } from '@/types';
+import logger from './logger';
 
 // docs: https://developers.printify.com/
 // keys: https://printify.com/app/account/api
@@ -32,53 +33,44 @@ export const formatCartItemsForPrintify = (cartItems: CartItem[]): PrintifyLineI
   }));
 };
 
-export async function createDraftOrder(lineItems: PrintifyLineItem[]): Promise<{ printifyOrderId: string }> {
-  try {
-    const randomId = crypto.randomUUID();
-    const randomLabel = Math.floor(Math.random() * 100000)
-      .toString()
-      .padStart(5, '0');
+export async function createDraftOrder(cartItems: CartItem[]): Promise<{ id: string }> {
+  logger.info('[Printify] Formatting cart items for Printify');
+  const printifyLineItems: PrintifyLineItem[] = formatCartItemsForPrintify(cartItems);
 
-    const orderData = {
-      external_id: randomId,
-      label: `shipment_${randomLabel}`,
-      // TODO_PRINTIFY (pull/format from stripe)
-      line_items: lineItems,
-      shipping_method: 1,
-      is_printify_express: false,
-      is_economy_shipping: false,
-      send_shipping_notification: false,
-      // TODO_PRINTIFY (pull address from stripe)
-      address_to: {
-        first_name: 'John',
-        last_name: 'Doe',
-        email: 'testing@beta.com',
-        phone: '0574 69 21 90',
-        country: 'BE',
-        region: '',
-        address1: 'ExampleBaan 121',
-        address2: '45',
-        city: 'Retie',
-        zip: '2470',
-      },
-    };
+  const randomId = crypto.randomUUID();
+  const randomLabel = Math.floor(Math.random() * 100000)
+    .toString()
+    .padStart(5, '0');
 
-    const result = await printify.orders.submit(orderData);
-    const { id: printifyOrderId } = result;
-    return { printifyOrderId };
-  } catch (error) {
-    console.error('[Printify] Error submitting order:', error);
-    return { printifyOrderId: '' };
-  }
+  const orderData: SubmitOrderData = {
+    external_id: randomId,
+    label: `shipment_${randomLabel}`,
+    // TODO_PRINTIFY (pull/format from stripe)
+    line_items: printifyLineItems,
+    shipping_method: 1,
+    is_printify_express: false,
+    is_economy_shipping: false,
+    send_shipping_notification: false,
+    // TODO_PRINTIFY (pull address from stripe)
+    address_to: {
+      first_name: 'John',
+      last_name: 'Doe',
+      email: 'testing@beta.com',
+      phone: '0574 69 21 90',
+      country: 'BE',
+      region: '',
+      address1: 'ExampleBaan 121',
+      address2: '45',
+      city: 'Retie',
+      zip: '2470',
+    },
+  };
+
+  const order = await printify.orders.submit(orderData);
+  return order;
 }
 
-export async function sendOrderToProduction(printifyOrderId: string): Promise<{ success: boolean }> {
-  try {
-    console.log('[Printify] sending order to product, printifyOrderId', printifyOrderId);
-    await printify.orders.sendToProduction(printifyOrderId);
-    return { success: true };
-  } catch (error) {
-    console.error('[Printify] Error sending order to production:', error);
-    return { success: false };
-  }
+export async function sendOrderToProduction(printifyOrderId: string) {
+  logger.info('[Printify] Sending order to production', { printifyOrderId });
+  await printify.orders.sendToProduction(printifyOrderId);
 }
