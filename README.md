@@ -1,12 +1,10 @@
 # SwagSticker.com ![Repo Status Badge](./.github/status-maintained-badge.svg)
 
-E-commerce store for developer laptop stickers, fully autonomous and scale-abe. Built with Jamstack and server-side rendering.
+Full-stack e-commerce store for developer laptop stickers. Automated with dropshipping
 
-<img width="800px" style="margin:auto" src="./.github/swagsticker.com-screenshot.png" alt="SwagSticker.com website screenshot">
+https://github.com/user-attachments/assets/d32962b3-6aa8-401c-ab43-440fff3e31cc
 
-## 🎥 Demo Video
-
-https://github.com/jadiaheno/vention-machine-cloud-test/assets/13062328/a42d55bb-0381-4d16-9ea3-24aced02e5d3
+<img width="800px" style="margin:auto" src="./.github/swagsticker.com-system-diagram.png" alt="SwagSticker.com system diagram">
 
 ## 🎯 Project Overview
 
@@ -27,43 +25,30 @@ https://github.com/jadiaheno/vention-machine-cloud-test/assets/13062328/a42d55bb
 
 - **Framework**: Next.js (React), TailwindCSS
 - **Language**: TypeScript
-- **Hosting**: Vercel (w/ Amazon Route53 domain)
-- **Third-Party**: Stripe (payments), Printify (drop-shipping)
-
-> **Specifications:**
->
-> - Node.js: >=v20
-> - React.js: v18
-> - Next.js: v14 (App Router)
-> - Vercel: serverless, hobby plan
-
-## 🏗️ System Diagram
-
-<!-- TODO_README -->
-
-![SwagSticker.com system diagram](./.github/swagsticker.com-system-diagram.png)
+- **Third-Party**: Stripe SDK (payments), Printify SDK (dropshipping)
+- **Hosting**: Vercel, Amazon Route53
 
 ## ⭐️ Features
 
-<!-- TODO_README -->
+<!-- ![Onboarding Feature](./TODO_README) _Users can use guest mode, or register/login._ -->
 
-- <auth feature no pass, or stay guest>
-- <browse the catalog, search, filter>
-- <add items to cart, proceed to checkout>
-- <use secure stripe form, place order>
-- <track shipping status>
+![Catalog Feature](./.github/feature-catalog-search.png) _Browse the catalog, filter by category, and sort._
+
+![View Product Feature](./.github/feature-view-product.png)_Add item to cart, proceed to checkout._
+
+![Checkout Feature](./.github/feature-checkout.png) _Place order and checkout with secure embedded Stripe form, optimized for conversions._
+
+<!-- ![Account Page Feature](./.github/TODO_README) _View orders, download receipts, and track shipping status._ -->
 
 ## 💻 Local Development
-
-📌 Note: this demo can be run locally; the production code is private for security reasons
 
 #### Prerequisites
 
 - **Node.js** installed on your machine (download [here](https://nodejs.org/en/download))
-- Stripe developer account (+ API keys)
-- `stripe-cli` (`$ brew install stripe/stripe-cli/stripe`)
-- Whitelisted endpoints for Stripe webhook (`https://website.com/api/v1/webhook/checkout`)
-- Printify developer account (+ API keys)
+- [Stripe](https://stripe.com) developer account (+ API keys)
+- [stripe-cli](https://github.com/stripe/stripe-cli) (`$ brew install stripe/stripe-cli/stripe`)
+- Whitelisted endpoints for [Stripe](https://dashboard.stripe.com) webhook (`https://website.com/api/v1/webhook/checkout`)
+- [Printify](https://printify.com) developer account (+ API keys)
 
 #### Installation
 
