@@ -9,7 +9,7 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   // https://github.com/stripe/stripe-node#configuration
   apiVersion: '2024-06-20',
   appInfo: {
-    name: 'swagsticker-ecommerce',
+    name: 'swagsticker-e-commerce',
     url: process.env.NEXT_PUBLIC_URL as string,
   },
 });
@@ -21,7 +21,7 @@ export const formatCartItemsForStripe = (cartItems: CartItem[]): Stripe.Checkout
         currency: cartItem.currency,
         product_data: {
           name: cartItem.name,
-          description: 'cartItem.description', // cartItem.description,
+          description: cartItem.description,
           // images: [`${process.env.NEXT_PUBLIC_URL}${cartItem.image}`], // up to 8 images
           images: [`https://swagsticker.com${cartItem.image}`], // up to 8 images
           metadata: {

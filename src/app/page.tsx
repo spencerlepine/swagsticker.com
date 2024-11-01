@@ -33,7 +33,7 @@ const LandingPage: React.FC<{ searchParams: { [key: string]: string | undefined 
         </div>
       )}
 
-      <CatalogPagination pageLimitIsReached={pageLimitIsReached} catalogFilters={catalogFilters} />
+      {products.length > 5 && <CatalogPagination pageLimitIsReached={pageLimitIsReached} catalogFilters={catalogFilters} />}
     </div>
   );
 };

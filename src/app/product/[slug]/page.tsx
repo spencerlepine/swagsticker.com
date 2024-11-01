@@ -27,24 +27,29 @@ export default function ProductPage({ params }: { params: { slug: string } }) {
   const productImages = [thumbnailImage, '/images/2x2in-sticker-mockup.jpg', '/images/3x3in-sticker-mockup.jpg', '/images/4x4in-sticker-mockup.jpg'];
 
   return (
-    <>
-      <div className="flex flex-col md:flex-row my-8">
-        <PhotoCarousel images={productImages} />
-        <div className="min-w-96 mx-4">
-          <h2 className="text-2xl font-semibold">{name}</h2>
+    <div className="container mx-auto px-4 my-8">
+      <div className="flex flex-col lg:flex-row gap-8">
+        <div className="w-full lg:w-1/2">
+          <PhotoCarousel images={productImages} />
+        </div>
+        <div className="w-full ml-4 lg:w-1/2 space-y-6">
+          <h2 className="text-2xl sm:text-3xl font-semibold">{name}</h2>
           <ProductSizeSelector product={product} />
           <hr className="my-4" />
-          <h4 className="text-md font-semibold inline">Description</h4>
-          <div className="text-gray-600 ml-2">
-            {description.split('\n').map((text, index) => (
-              <p key={index} className="text-wrap">
-                {text}
-              </p>
-            ))}
+          <div>
+            <h4 className="text-lg font-semibold mb-2">Description</h4>
+            <div className="text-gray-600 space-y-2">
+              {description.split('\n').map((text, index) => (
+                <p key={index} className="text-sm sm:text-base">
+                  {text}
+                </p>
+              ))}
+            </div>
           </div>
         </div>
       </div>
+
       {category && <RelatedProducts productId={id} category={category} />}
-    </>
+    </div>
   );
 }

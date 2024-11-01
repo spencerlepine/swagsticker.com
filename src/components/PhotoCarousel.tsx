@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
 const MAX_CAROUSEL_IMAGES = 4;
 
@@ -21,7 +22,7 @@ const PhotoCarousel: React.FC<{ images: string[] }> = ({ images }) => {
 
   return (
     <div className="flex">
-      <div className="w-1/12 mr-2">
+      <div className="w-2/12 mr-2">
         {images.map((imageUrl, index) => (
           <Image
             width={150}
@@ -36,13 +37,12 @@ const PhotoCarousel: React.FC<{ images: string[] }> = ({ images }) => {
         ))}
       </div>
       <div className="w-4/6 flex h-fit">
-        <div className="w-1/12 mr-2 flex items-center justify-between mx-4">
+        <div className="w-1/12 flex items-center justify-between mx-4">
           <button
             disabled={selectedImageIndx === 0}
             onClick={() => handleClick('prev')}
-            className="m-auto text-xl rounded-full px-4 py-2 shadow-md hover:shadow-lg hover:bg-gray-200"
-          >
-            {'<'}
+            className="m-auto text-xl rounded-full px-2 py-2 shadow-md hover:shadow-lg hover:bg-gray-200">
+            <IoIosArrowBack />
           </button>
         </div>
         <Image width={600} height={600} src={images[selectedImageIndx]} alt={defaultAlt} className="w-full h-auto object-contain" />
@@ -50,9 +50,8 @@ const PhotoCarousel: React.FC<{ images: string[] }> = ({ images }) => {
           <button
             disabled={selectedImageIndx === MAX_CAROUSEL_IMAGES - 1}
             onClick={() => handleClick('next')}
-            className="m-auto text-xl rounded-full px-4 py-2 shadow-md hover:shadow-lg hover:bg-gray-200"
-          >
-            {'>'}
+            className="m-auto text-xl rounded-full px-2 py-2 shadow-md hover:shadow-lg hover:bg-gray-200">
+            <IoIosArrowForward />
           </button>
         </div>
       </div>

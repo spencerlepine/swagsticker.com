@@ -2,6 +2,7 @@
 
 import React, { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { IoSearch } from 'react-icons/io5';
 
 const SearchBar = () => {
   const router = useRouter();
@@ -31,10 +32,10 @@ const SearchBar = () => {
 
   return (
     <form onSubmit={handleSearch}>
-      <div className="flex items-center">
-        <input type="text" placeholder="Search" className="border rounded-md px-3 py-2 mr-2" value={searchTerm} onChange={handleInputChange} onKeyDown={handlePressEnter} />
-        <button className="bg-blue-500 text-white px-3 py-2 rounded-md" type="submit">
-          Search
+      <div className="flex bg-white rounded-md border">
+        <input type="text" placeholder="Search" className="text-black rounded-md px-3 py-2 mr-2" value={searchTerm} onChange={handleInputChange} onKeyDown={handlePressEnter} />
+        <button className="text-white px-3  rounded-md" type="submit">
+          <IoSearch className="text-gray-500" />
         </button>
       </div>
     </form>
