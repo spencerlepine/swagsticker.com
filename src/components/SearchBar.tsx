@@ -31,10 +31,17 @@ const SearchBar = () => {
   };
 
   return (
-    <form onSubmit={handleSearch}>
+    <form onSubmit={handleSearch} className="w-96">
       <div className="flex bg-white rounded-md border">
-        <input type="text" placeholder="Search" className="text-black rounded-md px-3 py-2 mr-2" value={searchTerm} onChange={handleInputChange} onKeyDown={handlePressEnter} />
-        <button className="text-white px-3  rounded-md" type="submit">
+        <input
+          type="text"
+          placeholder="Search"
+          className="text-black rounded-md px-3 py-2 flex-grow"
+          value={searchTerm}
+          onChange={handleInputChange}
+          onKeyDown={handlePressEnter}
+        />
+        <button className="text-white px-3 py-2 rounded-md flex items-center justify-center" type="submit" aria-label="Search">
           <IoSearch className="text-gray-500" />
         </button>
       </div>
