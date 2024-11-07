@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ## [0.0.7] - 2024-11-07
 
 - Authentication with email-only OTP and JWT
+- Order history by customer email (on account page)
 
 ## [0.0.6] - 2024-10-26
 

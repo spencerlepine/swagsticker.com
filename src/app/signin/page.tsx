@@ -29,8 +29,8 @@ export default function SignInPage() {
   }, []);
 
   // Handle form submit for email
-  const handleEmailSubmit = async e => {
-    e.preventDefault();
+  const handleEmailSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsLoading(true);
     setError('');
 
@@ -59,8 +59,8 @@ export default function SignInPage() {
   };
 
   // Handle form submit for OTP
-  const handleOtpSubmit = async e => {
-    e.preventDefault();
+  const handleOtpSubmit = async (event: React.SyntheticEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setIsLoading(true);
     setError('');
 

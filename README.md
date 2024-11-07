@@ -30,7 +30,7 @@ https://github.com/user-attachments/assets/d32962b3-6aa8-401c-ab43-440fff3e31cc
 
 ## ⭐️ Features
 
-<!-- ![Onboarding Feature](./TODO_README) _Users can use guest mode, or register/login._ -->
+![Onboarding Feature](./.github/feature-email-login.png) _Authenticate with convenient and secure email-only login._
 
 ![Catalog Feature](./.github/feature-catalog-search.png) _Browse the catalog, filter by category, and sort._
 
@@ -38,7 +38,7 @@ https://github.com/user-attachments/assets/d32962b3-6aa8-401c-ab43-440fff3e31cc
 
 ![Checkout Feature](./.github/feature-checkout.png) _Place order and checkout with secure embedded Stripe form, optimized for conversions._
 
-<!-- ![Account Page Feature](./.github/TODO_README) _View orders, download receipts, and track shipping status._ -->
+![Account Page Feature](./.github/feature-view-orders.png) _View orders, download receipts, and track shipping status._
 
 ## 💻 Local Development
 

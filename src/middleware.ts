@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { jwtVerify } from 'jose'; // Import jwtVerify from jose for edge environment
 
-const PROTECTED_ROUTES = ['/account', '/api/v1/orders'];
+const PROTECTED_ROUTES = ['/account', '/api/v1/orders', 'api/v1/checkout'];
 const LOGIN_URL = '/signin';
 
 /**
@@ -62,5 +62,5 @@ export default async function middleware(req: NextRequest) {
 
 // Specify the routes to match for this middleware
 export const config = {
-  matcher: ['/api/v1/:path*', '/account', '/api/v1/orders/:path*'],
+  matcher: ['/api/v1/:path*', '/account', '/api/v1/orders/:path*', '/api/v1/checkout/:path*'],
 };

@@ -71,7 +71,7 @@ export async function createDraftOrder(
   phone: string | null
 ): Promise<{ id: string }> {
   const printifyLineItems: PrintifyLineItem[] = formatCartItemsForPrintify(cartItems);
-  console.log(printifyLineItems);
+
   const address = formatStripeAddress(stripeShippingDetails as StripeShippingDetails, email, phone);
   const orderData: SubmitOrderData = {
     external_id: stripeSessionId,

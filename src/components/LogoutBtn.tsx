@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/Button';
 
 const LogoutBtn: React.FC = () => {
   const router = useRouter();
@@ -21,9 +20,9 @@ const LogoutBtn: React.FC = () => {
   };
 
   return (
-    <Button variant="outline" onClick={handleLogout}>
+    <button className="border border-gray-300 rounded-md px-4 py-2" onClick={handleLogout}>
       Logout
-    </Button>
+    </button>
   );
 };
 

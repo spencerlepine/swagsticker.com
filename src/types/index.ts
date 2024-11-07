@@ -152,3 +152,28 @@ export interface StripeShippingDetails {
   address: Address;
   name: string;
 }
+
+export interface Order {
+  id: string;
+  date: string;
+  total: number;
+  status?: string;
+  trackingNumber?: string;
+  address: {
+    city: string | null;
+    country: string | null;
+    line1: string  | null;
+    line2?: string | null;
+    postal_code: string  | null;
+    state: string | null;
+  };
+  last4?: string | null;
+  receiptUrl?: string  | null;
+}
+
+export interface OrderItem {
+  id: string;
+  name: string;
+  price: number;
+  image: string;
+}

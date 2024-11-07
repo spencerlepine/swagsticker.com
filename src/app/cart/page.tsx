@@ -6,11 +6,13 @@ import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe
 import CartItemCard from '@/components/CartItemCard';
 import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { useShoppingCart } from 'use-shopping-cart';
+import { useRouter } from 'next/navigation';
 import { CartItem } from '@/types';
 
 export default function CartPage() {
   const { cartCount, cartDetails, removeItem, totalPrice, addItem, decrementItem } = useShoppingCart();
   const cartItems = Object.values(cartDetails ?? {});
+  const router = useRouter();
 
   const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
   const [showCheckout, setShowCheckout] = useState(false);
@@ -31,8 +33,17 @@ export default function CartPage() {
       },
       body: JSON.stringify({ cartItems }),
     })
-      .then(res => res.json())
-      .then(data => data.client_secret);
+      .then(res => {
+        if (!res.ok) {
+          router.push('/signin');
+          throw new Error('Failed to fetch client secret');
+        }
+        return res.json();
+      })
+      .then(data => data.client_secret)
+      .catch(error => {
+        console.error(error);
+      });
   };
 
   const options = { fetchClientSecret };
