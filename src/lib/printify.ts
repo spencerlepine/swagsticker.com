@@ -22,17 +22,15 @@ const PRINTIFY_VARIANT_IDS = {
   [STICKER_SIZES.FOUR_BY_FOUR_IN]: 95745,
 };
 
-// export const formatCartItemsForPrintify = (cartItems: CartItem[]): PrintifyLineItem[] => {
-//   return cartItems.map(cartItem => ({
-//     print_provider_id: PRINTIFY_PRINT_PROVIDER_ID,
-//     blueprint_id: PRINTIFY_BLUEPRINT_ID,
-//     variant_id: PRINTIFY_VARIANT_IDS[cartItem.product_data.size],
-//     print_areas: {
-//       front: retrieveStickerPNGFileUrl(cartItem.product_data.productId),
-//     },
-//     quantity: cartItem.quantity,
-//   }));
-// };
+export async function checkPrintifyStatus() {
+  try {
+    await printify.shops.list();
+    return "operational";
+  } catch (error) {
+    logger.error('[Status] Printify status check failed', { error });
+    return "degraded";
+  }
+}
 
 export const formatCartItemsForPrintify = (lineItems: StripeType.LineItem[]): PrintifyLineItem[] => {
   return lineItems.map(item => ({

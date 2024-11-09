@@ -2,6 +2,8 @@ import OrderConfirmation from '@/components/OrderConfirmation';
 import { stripe } from '@/lib/stripe';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic'; // Dynamic server-side rendering
+
 async function getSession(sessionId: string) {
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId!);

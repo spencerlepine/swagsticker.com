@@ -7,7 +7,7 @@ export const POST = async () => {
 
     response.cookies.set('authToken', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: true,
       maxAge: 0,
       path: '/',
     });

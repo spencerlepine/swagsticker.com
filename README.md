@@ -4,22 +4,14 @@ Full-stack e-commerce store for developer laptop stickers. Automated with dropsh
 
 https://github.com/user-attachments/assets/d32962b3-6aa8-401c-ab43-440fff3e31cc
 
-<img width="800px" style="margin:auto" src="./.github/swagsticker.com-system-diagram.png" alt="SwagSticker.com system diagram">
-
 ## 🎯 Project Overview
 
-<!-- TODO_README -->
-
-- designed autonomous and scalable e-commerce store
-- enabled both guest checkout and no-password login for seamless checkout experience (JSON-Web-Token (JWT))
-- designed an accessible, responsive, and performant UI with Next.js and TailwindCSS
-- utilized open-source SDKs to integrate third-party APIs
-- reduced initial load time to 1.2secs
-- generated product images with OpenCV python script
-- optimized load times and SEO with server-side rendering
-- avoided complex database setup with JSON product catalog and GraphQL for easy migration to headless CMS
-- secured checkout payments with stripe forms and bot detection
-- load test, >95% success rate with <300ms response for up to XXX users peak traffic
+- Developed an autonomous, full-stack **e-commerce** store using **Next.js** and **TypeScript**, supporting automated dropshipping via **Printify SDK**
+- Implemented **passwordless authentication** using JSON Web Tokens (JWT) for a secure, seamless checkout experience
+- Integrated **Stripe SDK** with embedded payment forms and Webhooks for secure, automated payment processing, including bot detection for fraud prevention
+- Enhanced page load speed and SEO with **server-side rendering**, achieving sub-2.5s initial load times
+- Scaled to handle 1,500+ monthly active users, supporting up to 50 requests per second during peak traffic
+- Conducted load tests to validate system reliability, achieving a >95% success rate with **P90 response times** between under 300 ms
 
 ## 🛠️ Built With
 
@@ -39,6 +31,10 @@ https://github.com/user-attachments/assets/d32962b3-6aa8-401c-ab43-440fff3e31cc
 ![Checkout Feature](./.github/feature-checkout.png) _Place order and checkout with secure embedded Stripe form, optimized for conversions._
 
 ![Account Page Feature](./.github/feature-view-orders.png) _View orders, download receipts, and track shipping status._
+
+## 🏗️ System Diagram
+
+<img width="800px" style="margin:auto" src="./.github/swagsticker.com-system-diagram.png" alt="SwagSticker.com system diagram">
 
 ## 💻 Local Development
 
@@ -70,6 +66,8 @@ npm run dev
 # visit http://locahost:3000
 ```
 
+## 🐋 Docker
+
 #### Local Docker Container
 
 ```sh
@@ -77,16 +75,17 @@ stripe login
 stripe listen --forward-to localhost:3000/api/v1/webhook/checkout
 # *open separate terminal*
 
-cp .env.template .env.development
-docker-compose -f ./docker/docker-compose.dev.yml --env-file .env.development up --build
+cp .env.template .env.production
+docker-compose -f ./docker/docker-compose.dev.yml --env-file .env.production up --build
 # visit http://locahost:3000
 ```
 
-#### Production Build
+#### Production Docker Build
 
 ```sh
 cp .env.template .env.production
-npm run build
+docker-compose -f ./docker/docker-compose.prod.yml --env-file .env.production up --build
+# visit http://localhost
 ```
 
 ## License

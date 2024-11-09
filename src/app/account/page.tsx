@@ -11,7 +11,6 @@ export default async function AccountPage() {
   const { email, error } = verifyJwt(token);
   if (error) return notFound();
 
-  console.log(email);
   const orders = await getOrders(email as string);
 
   return (

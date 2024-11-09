@@ -15,6 +15,16 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
   },
 });
 
+export async function checkStripeStatus() {
+  try {
+    await stripe.accounts.list({ limit: 1 });
+    return "operational";
+  } catch (error) {
+    logger.error('[Status] Stripe status check failed', { error });
+    return "degraded";
+  }
+}
+
 export const formatCartItemsForStripe = (cartItems: CartItem[]): Stripe.Checkout.SessionCreateParams.LineItem[] => {
   return cartItems.map(cartItem => {
     const lineItem = {
