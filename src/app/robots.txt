@@ -1,7 +1,0 @@
-User-Agent: *
-Allow: /
-Disallow: /cart
-Disallow: /account
-Disallow: /contact
-
-Sitemap: https://swagsticker.com/sitemap.xml
