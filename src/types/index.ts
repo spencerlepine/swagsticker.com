@@ -1,3 +1,5 @@
+import { LineItem, OrderShipment, ShippingProfile } from 'printify-sdk-js';
+
 export type Category = 'frontend' | 'backend' | 'fullstack' | 'devops' | 'cloud' | 'data-science' | 'developer' | 'mobile' | 'ai' | 'database';
 export type Type = 'sticker' | 'pack';
 export type Size = '2x2in' | '3x3in' | '4x4in';
@@ -23,6 +25,17 @@ export interface FilterSearchParams {
   category?: Category;
   sortBy?: SortByOption;
 }
+
+export type MetadataCartItem = {
+  name: string;
+  quantity: number;
+  price: number;
+  image: string;
+  product_data: {
+    size: string;
+    productId: string;
+  };
+};
 
 export type CartItem = {
   id: string;
@@ -67,113 +80,36 @@ export interface PaginatedProducts {
   pageLimitIsReached: boolean;
 }
 
-export interface PrintifyLineItem {
-  print_provider_id: number;
-  blueprint_id: number;
-  variant_id: number; // Assuming variantIds has numeric keys for sticker sizes
-  print_areas: {
-    front: string;
-  };
-  quantity: number;
-}
-
-interface PrintifyAddress {
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  country: string;
-  region: string; // optional
-  address1: string;
-  address2?: string; // optional
-  city: string;
-  zip: string;
-}
-
-export interface SubmitOrderData {
-  external_id: string;
-  label: string;
-  line_items: PrintifyLineItem[];
-  shipping_method: number;
-  is_printify_express: boolean;
-  is_economy_shipping: boolean;
-  send_shipping_notification: boolean;
-  address_to: PrintifyAddress;
-}
-
-export interface PrintifyShippingProfile {
-  variant_ids: number[];
-  first_item: {
-    cost: number;
-    currency: string;
-  };
-  additional_items: {
-    cost: number;
-    currency: string;
-  };
-  countries: string[];
-}
-
 export interface VariantShippingData {
-  profiles: PrintifyShippingProfile[];
+  profiles: ShippingProfile[];
 }
 
-export interface StripeShippingMethod {
-  shipping_rate_data: {
-    type: 'fixed_amount';
-    fixed_amount: {
-      amount: number;
-      currency: string; // Assuming PRODUCT_CONFIG.currency is of type string
-    };
-    display_name: string;
-    delivery_estimate: {
-      minimum: {
-        unit: 'business_day'; // You could also make this a union type if there are other units
-        value: number;
-      };
-      maximum: {
-        unit: 'business_day'; // Same as above
-        value: number;
-      };
-    };
-  };
-}
-
-interface Address {
-  city: string;
-  country: string;
-  line1: string;
-  line2?: string;
-  postal_code: string;
-  state: string;
-}
-
-export interface StripeShippingDetails {
-  address: Address;
-  name: string;
-}
-
-export interface Order {
+export interface OrderDetails {
   id: string;
-  date: string;
-  total: number;
+  date?: string;
+  total?: number;
   status?: string;
-  trackingNumber?: string;
-  address: {
+  address?: {
     city: string | null;
     country: string | null;
-    line1: string  | null;
+    line1: string | null;
     line2?: string | null;
-    postal_code: string  | null;
+    postal_code: string | null;
     state: string | null;
   };
   last4?: string | null;
-  receiptUrl?: string  | null;
-}
-
-export interface OrderItem {
-  id: string;
-  name: string;
-  price: number;
-  image: string;
+  receiptUrl?: string | null;
+  printifyOrderId?: string;
+  swagOrderId?: string;
+  shipments?: OrderShipment[];
+  metadata?: {
+    order_type: string;
+    shop_order_id: number;
+    shop_order_label: string;
+    shop_fulfilled_at: string;
+  };
+  line_items?: LineItem[];
+  total_price?: number;
+  total_shipping?: number;
+  address_to?: { email: string };
 }

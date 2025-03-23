@@ -41,16 +41,18 @@ const PhotoCarousel: React.FC<{ images: string[] }> = ({ images }) => {
           <button
             disabled={selectedImageIndx === 0}
             onClick={() => handleClick('prev')}
-            className="m-auto text-xl rounded-full px-2 py-2 shadow-md hover:shadow-lg hover:bg-gray-200">
+            className="m-auto text-xl rounded-full px-2 py-2 shadow-md hover:shadow-lg hover:bg-gray-200"
+          >
             <IoIosArrowBack />
           </button>
         </div>
-        <Image width={600} height={600} src={images[selectedImageIndx]} alt={defaultAlt} className="w-full h-auto object-contain" />
+        <Image priority width={600} height={600} src={images[selectedImageIndx]} alt={defaultAlt} className="w-full h-auto object-contain" />
         <div className="w-1/12 mr-2 flex items-center justify-between mx-4">
           <button
             disabled={selectedImageIndx === MAX_CAROUSEL_IMAGES - 1}
             onClick={() => handleClick('next')}
-            className="m-auto text-xl rounded-full px-2 py-2 shadow-md hover:shadow-lg hover:bg-gray-200">
+            className="m-auto text-xl rounded-full px-2 py-2 shadow-md hover:shadow-lg hover:bg-gray-200"
+          >
             <IoIosArrowForward />
           </button>
         </div>

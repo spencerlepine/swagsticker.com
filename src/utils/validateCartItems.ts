@@ -11,7 +11,7 @@ export const validateCartItems = (cartItems: CartItem[]): CartItem[] => {
   const VALID_CURRENCY = PRODUCT_CONFIG.currency;
 
   if (!Array.isArray(cartItems) || cartItems.length > MAX_ITEMS_ALLOWED || cartItems.length === 0) {
-    logger.warn('[Checkout] Invalid cart items received', { cartItems });
+    logger.warn('[Checkout] Invalid CartItems array received', { cartItems });
     throw new UserError('Unable to process checkout request');
   }
 
@@ -20,7 +20,7 @@ export const validateCartItems = (cartItems: CartItem[]): CartItem[] => {
   for (const item of cartItems) {
     // Basic type checks
     if (typeof item !== 'object' || !item.product_data || typeof item.product_data !== 'object') {
-      logger.warn('[Checkout] Invalid cart items received', { cartItems });
+      logger.warn('[Checkout] CartItem was not valid object', { cartItems });
       throw new UserError('Unable to process checkout request');
     }
 
@@ -45,13 +45,13 @@ export const validateCartItems = (cartItems: CartItem[]): CartItem[] => {
       item.image.length > MAX_STRING_LENGTH ||
       item.product_data.productId.length > MAX_STRING_LENGTH
     ) {
-      logger.warn('[Checkout] Invalid cart items received', { cartItems });
+      logger.warn('[Checkout] CartItem has invalid key/value data', { cartItems });
       throw new UserError('Unable to process checkout request');
     }
 
     // Validate size
     if (!ALLOWED_SIZES.includes(item.product_data.size)) {
-      logger.warn('[Checkout] Invalid cart items received', { cartItems });
+      logger.warn('[Checkout] CartItem has invalid size', { cartItems });
       throw new UserError('Unable to process checkout request');
     }
 

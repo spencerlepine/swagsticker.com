@@ -6,7 +6,7 @@ const faqs = [
   {
     question: 'What is your return policy?',
     answer:
-      'While we do not accept returns, we understand that sometimes things don&apos;t go as planned. If you&apos;re dissatisfied with your purchase, please contact our customer support team to discuss a possible refund. We&apos;ll do our best to find a solution that works for you.',
+      "While we do not accept returns, we understand that sometimes things don't go as planned. If you're dissatisfied with your purchase, please contact our customer support team to discuss a possible refund. We'll do our best to find a solution that works for you.",
   },
   {
     question: 'What payment methods do you accept?',
@@ -33,13 +33,11 @@ const faqs = [
   },
   {
     question: 'Can I cancel my order?',
-    answer:
-      'Unfortunately, we do not currently support order cancellations. However, we are working on adding this feature in the near future. If your order has not yet shipped, please contact our customer support team to see if there are any other options available.',
+    answer: 'We currently don’t support cancellations, but we’re working on it! If your order hasn’t shipped, contact our support team—we’ll do our best to help.',
   },
   {
     question: 'How do I contact customer support?',
-    answer:
-      'You can contact our customer support team by email at [email address]. Our customer support hours are [hours of operation]. For general inquiries or customer support, please visit our Contact page.',
+    answer: `Email us at ${process.env.NEXT_PUBLIC_CONTACT_EMAIL}. We're available Monday–Friday, 9 AM–5 PM PT. Visit our Contact page for more info!`,
   },
 ];
 

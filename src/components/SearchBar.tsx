@@ -20,7 +20,9 @@ const SearchBar = () => {
     }
   };
 
-  const handleSearch = () => {
+  const handleSearch = (event?: React.FormEvent) => {
+    if (event) event.preventDefault();
+
     const encodedTerm = encodeURIComponent(searchTerm.toLowerCase());
 
     const existingSearchParams = Object.fromEntries(searchParams);
@@ -34,6 +36,7 @@ const SearchBar = () => {
     <form onSubmit={handleSearch} className="w-96">
       <div className="flex bg-white rounded-md border">
         <input
+          data-testid="searchbar-input"
           type="text"
           placeholder="Search"
           className="text-black rounded-md px-3 py-2 flex-grow"
@@ -41,7 +44,7 @@ const SearchBar = () => {
           onChange={handleInputChange}
           onKeyDown={handlePressEnter}
         />
-        <button className="text-white px-3 py-2 rounded-md flex items-center justify-center" type="submit" aria-label="Search">
+        <button data-testid="searchbar-btn" className="text-white px-3 py-2 rounded-md flex items-center justify-center" type="submit" aria-label="Search">
           <IoSearch className="text-gray-500" />
         </button>
       </div>

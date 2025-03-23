@@ -1,17 +1,19 @@
 import { cookies } from 'next/headers';
 import LogoutBtn from '@/components/LogoutBtn';
 import { OrderCard } from '@/components/OrderCard';
-import { notFound } from 'next/navigation';
+import { redirect } from 'next/navigation';
 import { verifyJwt } from '@/lib/auth';
-import { getOrders } from '@/lib/orders';
 import Image from 'next/image';
+import { OrderDetails } from '@/types';
+import { getOrdersByEmail } from '@/lib/stripe';
 
+// Auth protected
 export default async function AccountPage() {
-  const token = cookies().get('authToken')?.value;
+  const token = cookies().get('swagAuthToken')?.value;
   const { email, error } = verifyJwt(token);
-  if (error) return notFound();
+  if (error) return redirect('/signin');
 
-  const orders = await getOrders(email as string);
+  const orders: OrderDetails[] = await getOrdersByEmail(email as string);
 
   return (
     <div className="mx-auto max-w-4xl p-6">
@@ -29,6 +31,7 @@ export default async function AccountPage() {
 
       <div className="space-y-6">
         <h2 className="text-2xl font-bold">Order History</h2>
+        <p className="text-gray-500">(within the last 180 days)</p>
 
         {!orders ||
           (orders.length === 0 && (

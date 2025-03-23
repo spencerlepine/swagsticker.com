@@ -1,8 +1,8 @@
 import winston from 'winston';
 
-const customFormat = winston.format.printf(({ timestamp, level, message, correlationId, ...meta }) => {
+const customFormat = winston.format.printf(({ timestamp, level, message, swagTraceId, ...meta }) => {
   const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
-  const requestIdString = correlationId ? ` requestId: ${correlationId}` : '';
+  const requestIdString = swagTraceId ? ` requestId: ${swagTraceId}` : '';
   return `[${timestamp}] ${level.toUpperCase()}: ${message} ${metaString}${requestIdString}`;
 });
 

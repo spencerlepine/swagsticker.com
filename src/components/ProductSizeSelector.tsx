@@ -34,6 +34,7 @@ const ProductSizeSelector: React.FC<{ product: Product }> = ({ product }) => {
         {sizes.map(({ value: size }) => (
           <button
             key={size}
+            data-testid={`productsize-btn-${size}`}
             onClick={() => handleSizeSelection(size as Size)}
             className={`border rounded-md px-4 py-1 text-md hover:bg-gray-300 ${selectedSize === size && 'bg-gray-300'}`}
           >

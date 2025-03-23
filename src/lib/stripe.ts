@@ -1,8 +1,8 @@
 import Stripe from 'stripe';
 import type { Stripe as StripeType } from 'stripe';
-import { PRODUCT_CONFIG } from '@/lib/products';
-import { CartItem, PrintifyShippingProfile, StripeShippingMethod } from '@/types';
+import { CartItem } from '@/types';
 import logger from './logger';
+import { OrderDetails } from '@/types';
 
 // docs: https://docs.stripe.com
 // keys: https://dashboard.stripe.com/apikeys
@@ -18,10 +18,10 @@ export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
 export async function checkStripeStatus() {
   try {
     await stripe.accounts.list({ limit: 1 });
-    return "operational";
+    return 'operational';
   } catch (error) {
     logger.error('[Status] Stripe status check failed', { error });
-    return "degraded";
+    return 'degraded';
   }
 }
 
@@ -53,96 +53,6 @@ export const formatCartItemsForStripe = (cartItems: CartItem[]): Stripe.Checkout
   });
 };
 
-const calculateStripeShipping = (cartItemCount: number, shippingMethod: PrintifyShippingProfile): StripeShippingMethod => {
-  const additionalItemCount = cartItemCount - 1;
-  const totalShippingCost = shippingMethod.first_item.cost + additionalItemCount * shippingMethod.additional_items.cost;
-
-  return {
-    shipping_rate_data: {
-      type: 'fixed_amount',
-      fixed_amount: {
-        amount: totalShippingCost,
-        currency: shippingMethod.first_item.currency,
-      },
-      display_name: `Shipping to US (Standard)`,
-      delivery_estimate: {
-        minimum: {
-          unit: 'business_day',
-          value: 2, // hard-coded, based on website (could pull from shippingMethod.handling_time)
-        },
-        maximum: {
-          unit: 'business_day',
-          value: 5, // hard-coded, based on website (could pull from shippingMethod.handling_time)
-        },
-      },
-    },
-  };
-};
-
-// docs: https://docs.stripe.com/api/checkout/sessions/create
-export async function createCheckoutSession(
-  cartItems: CartItem[],
-  shippingMethod: PrintifyShippingProfile,
-  customerEmail?: string,
-  metadata: { [key: string]: string } = {}
-): Promise<Stripe.Response<Stripe.Checkout.Session>> {
-  let customer;
-
-  try {
-    if (customerEmail) {
-      const customers = await stripe.customers.list({
-        email: customerEmail,
-        limit: 1,
-      });
-
-      if (customers.data.length > 0) {
-        customer = customers.data[0];
-        logger.info('[Stripe] Found existing customer:', customer.id);
-      } else {
-        customer = await stripe.customers.create({
-          email: customerEmail,
-          name: 'Username',
-          description: 'SwagSticker Customer',
-          phone: '+1234567890',
-        });
-        logger.info('[Stripe] Created new customer:', customer.id);
-      }
-    } else {
-      throw new Error('Email is required to create or find a customer');
-    }
-
-    logger.info('[Stripe] Formatting shipping methods for Stripe');
-    const stripeShippingMethod: StripeShippingMethod = calculateStripeShipping(cartItems.length, shippingMethod);
-
-    logger.info('[Stripe] Formatting cart items for Stripe');
-    const stripeLineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = formatCartItemsForStripe(cartItems);
-
-    // Create a Checkout session
-    const session = await stripe.checkout.sessions.create({
-      ui_mode: 'embedded',
-      payment_method_types: ['card'],
-      line_items: stripeLineItems,
-      metadata: metadata,
-      mode: 'payment',
-      return_url: `${process.env.NEXT_PUBLIC_URL}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
-      shipping_address_collection: {
-        allowed_countries: PRODUCT_CONFIG.allowCountries as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry[],
-      },
-      shipping_options: [stripeShippingMethod],
-      automatic_tax: { enabled: true },
-      customer: customer.id,
-      customer_update: {
-        shipping: 'auto',
-      }
-    });
-
-    return session;
-  } catch (error) {
-    logger.error('[Stripe] Error creating checkout session:', error);
-    throw new Error('Failed to create Stripe Checkout session');
-  }
-}
-
 export async function getChargesByEmail(customerEmail: string): Promise<StripeType.Charge[]> {
   try {
     const customer = await stripe.customers.list({
@@ -156,16 +66,36 @@ export async function getChargesByEmail(customerEmail: string): Promise<StripeTy
 
     const customerId = customer.data[0].id;
 
-    const ninetyDaysAgo = Math.floor(Date.now() / 1000) - 90 * 24 * 60 * 60;
+    const hundredEightyDaysAgo = Math.floor(Date.now() / 1000) - 180 * 24 * 60 * 60;
     const charges: StripeType.ApiList<StripeType.Charge> = await stripe.charges.list({
       customer: customerId,
-      created: { gte: ninetyDaysAgo }, // Only charges from the last 90 days
+      created: { gte: hundredEightyDaysAgo }, // Only charges from the last 180 days
     });
 
     return charges.data;
   } catch (error) {
-    console.error('Error fetching charges:', error);
+    logger.error('Error fetching charges:', error);
     return [];
   }
 }
 
+export async function getOrdersByEmail(customerEmail: string): Promise<OrderDetails[]> {
+  const charges: StripeType.Charge[] = await getChargesByEmail(customerEmail);
+
+  const formattedCharges = charges.map((charge: StripeType.Charge) => ({
+    id: charge.metadata?.swagOrderId,
+    printifyOrderId: charge.metadata?.printifyOrderId,
+    swagOrderId: charge.metadata?.swagOrderId,
+    date: new Date(charge.created * 1000).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    }),
+    total: charge.amount / 100,
+    address: charge.shipping?.address as StripeType.Address,
+    last4: charge.payment_method_details?.card?.last4 || null,
+    receiptUrl: charge.receipt_url || null,
+  }));
+
+  return formattedCharges;
+}

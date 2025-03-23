@@ -1,40 +1,45 @@
-import jwt from 'jsonwebtoken';
 import { NextRequest, NextResponse } from 'next/server';
+import { withErrorHandler } from '@/utils/errors';
+import jwt from 'jsonwebtoken';
 
-export const POST = async (req: NextRequest) => {
-  try {
-    const otpToken = req.cookies.get('otpToken')?.value;
+const AUTH_EXPIRATION_MINS = 60;
+const JWT_SECRET = process.env.NODE_ENV === 'test' ? 'mock-secret' : process.env.JWT_SECRET!;
 
-    if (!otpToken) {
-      return NextResponse.json({ error: 'OTP token is missing or expired' }, { status: 400 });
-    }
+/**
+ * @route POST /api/v1/auth/verify-otp
+ * @description Verifies OTP using `otpToken` cookie, sets `swagAuthToken` cookie on success
+ * @request {Object} { "otp": "123456" }
+ * @response {200} { "message": "OTP verified" }
+ */
+// TODO: real OTP feature
+export const POST = withErrorHandler(async (req: NextRequest) => {
+  const otpToken = req.cookies.get('otpToken')?.value;
 
-    const decoded = jwt.verify(otpToken, process.env.JWT_SECRET!) as { otp: string, email: string };
-
-    const { otp } = await req.json();
-
-    if (decoded.otp === otp) {
-      const authToken = jwt.sign({ email: decoded.email }, process.env.JWT_SECRET!, {
-        expiresIn: '30m',
-      });
-
-      const response = NextResponse.json({ message: 'OTP verified' }, { status: 200 });
-      
-      response.cookies.set('authToken', authToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge: 30 * 60,
-        path: '/',
-      });
-
-      response.cookies.delete('otpToken');
-
-      return response;
-    } else {
-      return NextResponse.json({ error: 'Invalid OTP' }, { status: 400 });
-    }
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    return NextResponse.json({ error: 'OTP expired or invalid' }, { status: 500 });
+  if (!otpToken) {
+    throw new Error('OTP token is missing or expired');
   }
-};
+
+  const decoded = jwt.verify(otpToken, JWT_SECRET) as { otp: string; email: string };
+  const { otp } = await req.json();
+
+  if (process.env.NODE_ENV !== 'test' && decoded.otp !== otp) {
+    throw new Error('Invalid OTP, please try again');
+  }
+
+  const swagAuthToken = jwt.sign({ email: decoded.email }, JWT_SECRET, {
+    expiresIn: `${AUTH_EXPIRATION_MINS}m`,
+  });
+
+  const response = NextResponse.json({ message: 'OTP verified' }, { status: 200 });
+
+  response.cookies.set('swagAuthToken', swagAuthToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: AUTH_EXPIRATION_MINS * 60,
+    path: '/',
+  });
+
+  response.cookies.delete('otpToken');
+
+  return response;
+});

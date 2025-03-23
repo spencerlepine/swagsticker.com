@@ -3,6 +3,8 @@
 .env*
 !.env.template
 
+docs/swagsticker-system-diagram.excalidraw
+
 # dependencies
 /node_modules
 /.pnp

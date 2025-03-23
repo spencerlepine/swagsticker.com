@@ -2,7 +2,7 @@ import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { CartItem } from '@/types';
 import Image from 'next/image';
 
-const CartItemCard: React.FC<{ cartItem: CartItem; handleRemove: () => void; handleAdd: () => void }> = ({ cartItem, handleRemove, handleAdd }) => {
+const CartItemCard: React.FC<{ cartItem: CartItem; handleRemove: () => void; handleAdd: (cartItem: CartItem) => void }> = ({ cartItem, handleRemove, handleAdd }) => {
   const { image, name, product_data, quantity, price } = cartItem;
   const { size } = product_data;
   const formattedPrice = formatPriceForDisplay(price);
@@ -12,7 +12,9 @@ const CartItemCard: React.FC<{ cartItem: CartItem; handleRemove: () => void; han
       <div className="flex items-center">
         <Image width={100} height={100} src={image} alt={name} className="w-16 h-16 mr-4 object-cover" />
         <div>
-          <h3 className="font-semibold text-lg">{name}</h3>
+          <h3 className="font-semibold text-lg">
+            <a href={`/product/${product_data.productId}`}>{name}</a>
+          </h3>
           <p className="text-gray-600">{size}</p>
         </div>
       </div>
@@ -22,7 +24,7 @@ const CartItemCard: React.FC<{ cartItem: CartItem; handleRemove: () => void; han
           -
         </button>
         <span className="px-4 font-semibold">{quantity}</span>
-        <button className="text-gray-600 hover:bg-gray-200 focus:outline-none border border-gray-500 rounded-md px-3 py-1" onClick={handleAdd}>
+        <button className="text-gray-600 hover:bg-gray-200 focus:outline-none border border-gray-500 rounded-md px-3 py-1" onClick={() => handleAdd(cartItem)}>
           +
         </button>
       </div>

@@ -1,74 +1,88 @@
 'use client';
 
 import React, { useState } from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { EmbeddedCheckoutProvider, EmbeddedCheckout } from '@stripe/react-stripe-js';
 import CartItemCard from '@/components/CartItemCard';
 import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { useShoppingCart } from 'use-shopping-cart';
-import { useRouter } from 'next/navigation';
 import { CartItem } from '@/types';
+import { usePopupAlert } from '@/providers/AlertProvider';
+import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
   const { cartCount, cartDetails, removeItem, totalPrice, addItem, decrementItem } = useShoppingCart();
   const cartItems = Object.values(cartDetails ?? {});
+  const { setAlert } = usePopupAlert();
   const router = useRouter();
-
-  const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!);
-  const [showCheckout, setShowCheckout] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleRemove = (cartItem: CartItem) => {
-    if (cartItem.quantity === 1) {
-      removeItem(cartItem.id);
-    } else {
-      decrementItem(cartItem.id);
+    try {
+      if (cartItem.quantity === 1) {
+        removeItem(cartItem.id);
+      } else {
+        decrementItem(cartItem.id);
+      }
+    } catch (error) {
+      setAlert('Failed to remove cart item', 'error');
+      console.error('RemoveFromCartBtn error', error);
     }
   };
 
-  const fetchClientSecret = () => {
-    return fetch('/api/v1/checkout', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ cartItems }),
-    })
-      .then(res => {
-        if (!res.ok) {
-          router.push('/signin');
-          throw new Error('Failed to fetch client secret');
-        }
-        return res.json();
-      })
-      .then(data => data.client_secret)
-      .catch(error => {
-        console.error(error);
+  const handleAdd = (cartItem: CartItem) => {
+    try {
+      addItem(cartItem);
+    } catch (error) {
+      setAlert('Failed to add cart item', 'error');
+      console.error('AddToCartBtn error', error);
+    }
+  };
+
+  const handleInitiateCheckout = async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch('/api/v1/checkout/create-payment-intent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ cartItems }),
       });
+
+      if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+          router.push('/signin');
+          return;
+        }
+        throw new Error('Checkout error');
+      }
+
+      const { clientSecret } = await response.json();
+      if (!clientSecret) {
+        throw new Error('Client secret not received');
+      }
+
+      router.push(`/checkout?clientSecret=${clientSecret}`);
+    } catch (error) {
+      setAlert('Checkout is currently unavailable', 'error');
+      console.error('CheckoutBtn error', error);
+      router.push(`/cart`);
+    } finally {
+      setIsLoading(false);
+    }
   };
-
-  const options = { fetchClientSecret };
-
-  const handleCheckoutClick = () => {
-    setShowCheckout(true);
-  };
-
-  if (showCheckout) {
-    return (
-      <div className="py-4 my-8">
-        <EmbeddedCheckoutProvider stripe={stripePromise} options={options}>
-          <EmbeddedCheckout />
-        </EmbeddedCheckoutProvider>
-      </div>
-    );
-  }
 
   const subtotal = formatPriceForDisplay(totalPrice);
   return (
     <div className="my-8 mx-20">
       <div className="flex justify-between items-center p-4">
         <span className="text-lg font-semibold">Subtotal: {subtotal}</span>
-        <button disabled={!cartCount} className="btn bg-green-500 text-white px-4 py-2 rounded-md focus:outline-none" onClick={handleCheckoutClick}>
-          Checkout
+        <button
+          data-testid={`checkout-btn`}
+          disabled={!cartCount || isLoading}
+          className="btn bg-green-500 text-white px-4 py-2 rounded-md focus:outline-none"
+          onClick={handleInitiateCheckout}
+        >
+          {isLoading ? 'Processing...' : 'Checkout'}
         </button>
       </div>
 
@@ -85,7 +99,7 @@ export default function CartPage() {
       {cartItems && cartItems.length > 0 && (
         <ul>
           {cartItems.map(cartItem => (
-            <CartItemCard key={cartItem.id} handleRemove={() => handleRemove(cartItem as CartItem)} handleAdd={() => addItem(cartItem)} cartItem={cartItem as CartItem} />
+            <CartItemCard key={cartItem.id} handleRemove={() => handleRemove(cartItem as CartItem)} handleAdd={handleAdd} cartItem={cartItem as CartItem} />
           ))}
         </ul>
       )}

@@ -1,9 +1,11 @@
 import type { Metadata } from 'next';
+import { AlertProvider } from '@/providers/AlertProvider';
 import CartProvider from '@/providers/CartProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import localFont from 'next/font/local';
 import './globals.css';
+import AlertPopup from '@/components/AlertPopup';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -29,11 +31,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased text-foreground bg-background font-sans text-balance flex flex-col h-screen `}>
-        <CartProvider>
-          <Header />
-          <main className="container mx-auto flex-grow font-[family-name:var(--font-geist-sans)]">{children}</main>
-          <Footer />
-        </CartProvider>
+        <AlertProvider>
+          <CartProvider>
+            <AlertPopup />
+            <Header />
+            <main className="container mx-auto flex-grow font-[family-name:var(--font-geist-sans)]">{children}</main>
+            <Footer />
+          </CartProvider>
+        </AlertProvider>
       </body>
     </html>
   );

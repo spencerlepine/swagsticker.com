@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server';
+import { withErrorHandler } from '@/utils/errors';
 
-export const POST = async () => {
-  try {
-    // Clear the authToken cookie on logout
-    const response = NextResponse.json({ message: 'Logged out successfully' }, { status: 200 });
+/**
+ * @route POST /api/v1/auth/logout
+ * @description Logs out user, clears `swagAuthToken` cookie.
+ * @response {200} { message: string } - "Logged out successfully"
+ */
+export const POST = withErrorHandler(async () => {
+  const response = NextResponse.json({ message: 'Logged out successfully' }, { status: 200 });
 
-    response.cookies.set('authToken', '', {
-      httpOnly: true,
-      secure: true,
-      maxAge: 0,
-      path: '/',
-    });
+  response.cookies.set('swagAuthToken', '', {
+    httpOnly: true,
+    secure: true,
+    maxAge: 0,
+    path: '/',
+  });
 
-    return response;
-  } catch (error) {
-    console.error('Error during logout:', error);
-    return NextResponse.json({ error: 'Error logging out' }, { status: 500 });
-  }
-};
+  return response;
+});
