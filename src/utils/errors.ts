@@ -1,4 +1,5 @@
 import logger from '@/lib/logger';
+import { RouteContext, RouteHandler } from '@/types';
 import { NextRequest, NextResponse } from 'next/server';
 
 export class UserError extends Error {
@@ -42,17 +43,8 @@ export const handleApiError = (error: unknown, message = 'Internal Server Error'
   );
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type ApiHandler = (req: NextRequest, ...args: any[]) => Promise<NextResponse>;
-
-export const withErrorHandler =
-  (handler: ApiHandler) =>
-  async (
-    request: NextRequest,
-    context: {
-      params: { [key: string]: string | number };
-    }
-  ) => {
+export const withErrorHandler = (handler: RouteHandler) =>
+  async (request: NextRequest, context: RouteContext) => {
     try {
       return await handler(request, context);
     } catch (error: unknown) {

@@ -1,12 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
-
 import OrderConfirmationForm from './OrderConfirmationForm';
-
-jest.mock('use-shopping-cart', () => ({
-  useShoppingCart: () => ({
-    clearCart: jest.fn(),
-  }),
-}));
 
 const mockProps = {
   cartItems: [
@@ -57,7 +50,6 @@ global.fetch = jest.fn(() =>
 
 describe('OrderConfirmationForm', () => {
   beforeEach(() => {
-    // Mock window.location for payment intent
     Object.defineProperty(window, 'location', {
       writable: true,
       value: {
@@ -65,7 +57,6 @@ describe('OrderConfirmationForm', () => {
       },
     });
 
-    // Mock Stripe
     jest.mock('@stripe/stripe-js', () => ({
       loadStripe: jest.fn().mockResolvedValue({
         retrievePaymentIntent: jest.fn().mockResolvedValue({
@@ -92,7 +83,6 @@ describe('OrderConfirmationForm', () => {
   });
 
   it('renders confirmation order id and view orders link on success', async () => {
-    // Mock the order confirmation fetch
     global.fetch = jest
       .fn()
       .mockResolvedValueOnce({

@@ -3,14 +3,14 @@ import { withAuthHandler } from '@/lib/auth';
 import { type Order as PrintifyOrder } from 'printify-sdk-js';
 import { AuthError, withErrorHandler, UserError } from '@/utils/errors';
 import logger from '@/lib/logger';
-import { SwagOrderDetails } from '@/types';
+import { AuthenticatedHandler, SwagOrderDetails } from '@/types';
 
 /**
  * @route GET /api/v1/orders/{orderId}
  * @description Retrieves a specific Printify order by ID. Requires authentication.
  * @response {200} { "id": "string", "status": "string", "tracking": object|null, "address_to": object, "line_items": array, "total_price": number, "total_shipping": number, "metadata": object }
  */
-export const GET = withErrorHandler(
+export const GET: AuthenticatedHandler = withErrorHandler(
   withAuthHandler(async (req: NextRequest, { params }, email: string) => {
     const { printify } = await import('@/lib/printify');
 

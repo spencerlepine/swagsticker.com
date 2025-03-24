@@ -78,12 +78,9 @@ export default function SignInPage() {
       });
       const data = await response.json();
       if (response.ok) {
-        // Preload the home page to reduce CLS
         router.prefetch('/');
-        // Add a small delay to ensure smooth transition
         setTimeout(() => {
           router.push('/');
-          // Remove router.refresh() unless needed for server state
         }, 100);
       } else {
         setError(data.error || 'Invalid OTP, please try again');

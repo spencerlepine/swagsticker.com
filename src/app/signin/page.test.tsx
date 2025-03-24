@@ -1,10 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import SignInPage from './page';
 
-jest.mock('@/providers/AlertProvider', () => ({ usePopupAlert: () => ({ setAlert: jest.fn() }) }));
-jest.mock('next/navigation', () => ({
-  useRouter: jest.fn(),
-}));
 global.fetch = jest.fn(() =>
   Promise.resolve({
     ok: true,

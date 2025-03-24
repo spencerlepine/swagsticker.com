@@ -16,11 +16,6 @@ const faqs = [
     question: 'Do you offer international shipping?',
     answer: 'No, we currently only offer shipping within the United States.',
   },
-  // {
-  //   question: 'Do you offer international shipping?',
-  //   answer:
-  //     'Yes, we offer international shipping to most countries with estimated delivery times of 2-5 business days for US orders and 10-30 business days for international orders. Please enter your shipping address during checkout for accurate rates and times.',
-  // },
   {
     question: 'How can I track my order?',
     answer:

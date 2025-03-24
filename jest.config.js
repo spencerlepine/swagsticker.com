@@ -11,14 +11,20 @@ const config = {
       transform: {
         '^.+\\.(ts|tsx)$': ['ts-jest', { tsconfig: '<rootDir>/tests/react-tsconfig.json' }],
       },
-      setupFilesAfterEnv: ['@testing-library/jest-dom'],
+      setupFilesAfterEnv: ['@testing-library/jest-dom', '<rootDir>/tests/setupReactTests.js'],
       moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
     },
     {
       displayName: 'node',
       preset: 'ts-jest',
       testEnvironment: 'node',
-      testMatch: ['<rootDir>/src/**/?(*.)+(spec|test).ts'],
+      testMatch: [
+        '<rootDir>/src/**/?(*.)+(spec|test).ts',
+        // TODO: framework-agnostic API route tests
+        // '<rootDir>/tests/**/?(*.)+(spec|test).ts'
+      ],
+      // setupFilesAfterEnv: ['<rootDir>/tests/setupNodeTests.ts'],
+      // globalTeardown: '<rootDir>/tests/teardown.js',
       moduleNameMapper: {
         '^@/(.*)$': '<rootDir>/src/$1',
       },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthError, UserError, withErrorHandler } from '@/utils/errors';
 import jwt from 'jsonwebtoken';
+import { RouteHandler } from '@/types';
 
 const AUTH_EXPIRATION_MINS = 60;
 const JWT_SECRET = process.env.NODE_ENV === 'test' ? 'mock-secret' : process.env.JWT_SECRET!;
@@ -12,7 +13,7 @@ const JWT_SECRET = process.env.NODE_ENV === 'test' ? 'mock-secret' : process.env
  * @response {200} { "message": "OTP verified" }
  */
 // TODO: real OTP feature
-export const POST = withErrorHandler(async (req: NextRequest) => {
+export const POST: RouteHandler = withErrorHandler(async (req: NextRequest) => {
   const otpToken = req.cookies.get('otpToken')?.value;
 
   if (!otpToken) {

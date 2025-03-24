@@ -7,17 +7,14 @@ const outputFile = 'docs/API.md';
 const timestamp = new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
 let content = `# SwagSticker API\n\n> _Last updated: ${timestamp}_\n\n`;
 
-// Function to extract and format JSDoc comments
 function extractComments(filePath) {
   const fileContent = fs.readFileSync(filePath, 'utf8');
 
-  // Match JSDoc block (/** ... */)
   const commentMatch = fileContent.match(/\/\*\*\s*\n([\s\S]*?)\s*\*\//);
   if (!commentMatch) return;
 
   const commentContent = commentMatch[1];
 
-  // Extract tags from JSDoc
   const routeMatch = commentContent.match(/@route\s+([A-Z]+)\s+([^\n]+)/);
   const descMatch = commentContent.match(/@description\s+([^\n]+)/);
   const authMatch = commentContent.match(/@auth\s+required/);
@@ -53,7 +50,6 @@ function extractComments(filePath) {
   }
 }
 
-// Recursively process all .ts files
 function processDirectory(dir) {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
 

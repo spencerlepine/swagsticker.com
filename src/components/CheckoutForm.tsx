@@ -16,7 +16,6 @@ function StripePaymentIframe() {
   const [message, setMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Check if Stripe elements are ready
   const isStripeReady = stripe && elements;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -117,8 +116,7 @@ function StripePaymentIframe() {
           transition-colors duration-200
           flex items-center justify-center
           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
-        `}
-      >
+        `}>
         {isLoading ? (
           <>
             <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

@@ -1,4 +1,4 @@
-import { GET as verifyAuthEndpoint } from './route'; // Adjust the import path accordingly
+import { GET as verifyAuthEndpoint } from './route';
 import { verifyJwt } from '@/lib/auth';
 import { createRequest, testApiResponse, createValidToken, createExpiredToken } from '../../../../../../tests/test-helpers';
 
@@ -17,10 +17,8 @@ describe('verifyAuthEndpoint /api/v1/auth/verify', () => {
     expiredToken = await createExpiredToken(validEmail);
   });
 
-  // Success Tests
   describe('Success cases', () => {
     it('should return isAuthenticated as true for a valid token', async () => {
-      // Mock the verifyJwt to simulate valid token behavior
       (verifyJwt as jest.Mock).mockReturnValueOnce({ error: null });
 
       const req = createRequest('/auth/verify', validToken);
@@ -31,10 +29,8 @@ describe('verifyAuthEndpoint /api/v1/auth/verify', () => {
     });
   });
 
-  // Failure Tests
   describe('Failure cases', () => {
     it('should return isAuthenticated as false for an invalid token', async () => {
-      // Mock the verifyJwt to simulate invalid token behavior
       (verifyJwt as jest.Mock).mockReturnValueOnce({ error: 'Invalid token' });
 
       const req = createRequest('/auth/verify', 'invalid-token');
@@ -46,7 +42,6 @@ describe('verifyAuthEndpoint /api/v1/auth/verify', () => {
     });
 
     it('should return isAuthenticated as false for an expired token', async () => {
-      // Mock the verifyJwt to simulate expired token behavior
       (verifyJwt as jest.Mock).mockReturnValueOnce({ error: 'Token expired' });
 
       const req = createRequest('/auth/verify', expiredToken);
@@ -63,7 +58,6 @@ describe('verifyAuthEndpoint /api/v1/auth/verify', () => {
     });
   });
 
-  // Security Tests
   describe('Security tests', () => {
     it('should reject requests with malformed token', async () => {
       (verifyJwt as jest.Mock).mockReturnValueOnce({ error: 'Invalid token' });

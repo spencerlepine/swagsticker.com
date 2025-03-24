@@ -1,3 +1,4 @@
+import { NextRequest, NextResponse } from 'next/server';
 import { LineItem, OrderShipment, ShippingProfile } from 'printify-sdk-js';
 
 export type Category = 'frontend' | 'backend' | 'fullstack' | 'devops' | 'cloud' | 'data-science' | 'developer' | 'mobile' | 'ai' | 'database';
@@ -92,3 +93,18 @@ export interface SwagOrderDetails {
   total_shipping?: number;
   address_to?: { email: string };
 }
+
+export type RouteHandler = (
+  req: NextRequest,
+  context: RouteContext
+) => Promise<NextResponse>;
+
+export type AuthenticatedHandler = (
+  req: NextRequest,
+  context: RouteContext,
+  email: string
+) => Promise<NextResponse>;
+
+export type RouteContext = {
+  params: { [key: string]: string | string[] };
+};

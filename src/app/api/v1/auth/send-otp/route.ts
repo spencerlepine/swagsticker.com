@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandler } from '@/utils/errors';
 import jwt from 'jsonwebtoken';
 import { sendOTPEmail } from '@/lib/mailer';
+import { RouteHandler } from '@/types';
 
 const JWT_SECRET = process.env.NODE_ENV === 'test' ? 'mock-secret' : process.env.JWT_SECRET!;
 
@@ -11,7 +12,7 @@ const JWT_SECRET = process.env.NODE_ENV === 'test' ? 'mock-secret' : process.env
  * @request {Object} { "email": "user@example.com" }
  * @response {200} { "message": "OTP sent successfully" }
  */
-export const POST = withErrorHandler(async (req: NextRequest) => {
+export const POST: RouteHandler = withErrorHandler(async (req: NextRequest) => {
   const { email } = await req.json();
 
   if (!email) {

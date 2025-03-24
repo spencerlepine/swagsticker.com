@@ -45,7 +45,6 @@ describe('POST /api/v1/checkout/checkout/create-payment-intent', () => {
     },
   ];
   const shippingMethod = { first_item: { cost: 5 }, additional_items: { cost: 2 } };
-  // const orderSubtotal = 10 + 2 * 20 + 5 + 2 * 1;
   const customer = { id: 'cus_123' };
   const paymentIntent = { client_secret: 'pi_123_secret' };
 

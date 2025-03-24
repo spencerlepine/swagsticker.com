@@ -16,7 +16,6 @@ export default async function middleware(req: NextRequest) {
   });
 }
 
-// apply middleware to all api endpoints
 export const config = {
   matcher: ['/api/v1/:path*'],
 };

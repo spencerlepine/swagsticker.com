@@ -45,7 +45,7 @@ https://github.com/user-attachments/assets/c68b9266-fea0-42e5-86fb-af4fb6efff36
 
 - **Node.js** – [Install here](https://nodejs.org/en/download).
 - **Stripe** – [Developer account](https://stripe.com) with API keys.
-- **Gmail Integration** – generate credentials [here](https://security.google.com/settings/security/apppasswords):
+- **Gmail** – a [Google App Password](https://support.google.com/accounts/answer/185833)
 - **Printify** – [Developer account](https://printify.com) with API keys.
 - **Printify Shop ID** – Retrieve with:
   ```sh

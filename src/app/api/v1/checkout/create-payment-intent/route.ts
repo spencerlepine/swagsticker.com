@@ -3,7 +3,9 @@ import { withAuthHandler } from '@/lib/auth';
 import { withErrorHandler } from '@/utils/errors';
 import validateCartItems from '@/utils/validateCartItems';
 import logger from '@/lib/logger';
-import { SwagCartItem, MetadataCartItem } from '@/types';
+import { SwagCartItem, MetadataCartItem, AuthenticatedHandler } from '@/types';
+
+// TODO: calculate taxes?
 
 /**
  * @route POST /api/v1/checkout/create-payment-intent
@@ -11,7 +13,7 @@ import { SwagCartItem, MetadataCartItem } from '@/types';
  * @request {Object} { "cartItems": [{ "name": "string", "quantity": number, "price": number, "image": "string", "product_data": { "size": "string", "productId": "string" } }] }
  * @response {200} { "clientSecret": "pi_..." }
  */
-export const POST = withErrorHandler(
+export const POST: AuthenticatedHandler = withErrorHandler(
   withAuthHandler(async (request: NextRequest, context, email: string) => {
     const { stripe } = await import('@/lib/stripe');
     const { retrieveShippingCost } = await import('@/lib/printify');
@@ -37,9 +39,9 @@ export const POST = withErrorHandler(
       customers.data[0] ||
       (await stripe.customers.create({
         email,
-        name: email, // placeholder name
+        name: email,
         description: 'SwagSticker Customer',
-        phone: '+1234567890', // placeholder #
+        phone: '+1234567890',
       }));
 
     logger.info('[Stripe] creating payment intent', { swagTraceId });

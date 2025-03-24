@@ -7,19 +7,17 @@ import { verifyJwt } from '@/lib/auth';
 jest.mock('next/headers', () => ({
   cookies: jest.fn(),
 }));
-const mockCookies = cookies as jest.Mock;
 
 jest.mock('@/lib/auth', () => ({
   verifyJwt: jest.fn(),
 }));
-const mockVerifyJwt = verifyJwt as jest.Mock;
 
 describe('SignInNavLink Component', () => {
   it('renders the "Account" link when the user is authenticated', async () => {
-    mockCookies.mockReturnValue({
-      get: jest.fn().mockReturnValue({ value: 'valid_token' }),
+    (cookies as jest.Mock).mockReturnValueOnce({
+      get: jest.fn().mockReturnValueOnce({ value: 'valid_token' }),
     });
-    mockVerifyJwt.mockReturnValue({ error: null }); // No error means the user is authenticated
+    (verifyJwt as jest.Mock).mockReturnValueOnce({ error: null });
 
     render(<SignInNavLink />);
 
@@ -29,10 +27,10 @@ describe('SignInNavLink Component', () => {
   });
 
   it('renders the "Sign In" link when the user is not authenticated', async () => {
-    mockCookies.mockReturnValue({
-      get: jest.fn().mockReturnValue({ value: '' }), // No token
+    (cookies as jest.Mock).mockReturnValueOnce({
+      get: jest.fn().mockReturnValueOnce({ value: '' }),
     });
-    mockVerifyJwt.mockReturnValue({ error: 'Invalid token' }); // Invalid token means the user is not authenticated
+    (verifyJwt as jest.Mock).mockReturnValueOnce({ error: 'Invalid token' });
 
     render(<SignInNavLink />);
 

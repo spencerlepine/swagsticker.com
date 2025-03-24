@@ -27,23 +27,20 @@ export async function checkStripeStatus() {
 
 export const formatCartItemsForStripe = (cartItems: SwagCartItem[]): Stripe.Checkout.SessionCreateParams.LineItem[] => {
   return cartItems.map(cartItem => {
-    const lineItem = {
+    const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = {
       price_data: {
         currency: cartItem.currency,
         product_data: {
           name: cartItem.name,
           description: cartItem.description,
-          // note: Stripe will reject localhost urls. override for development
-          images: [process.env.NODE_ENV === 'production' ? `${process.env.NEXT_PUBLIC_URL}${cartItem.image}` : `https://swagsticker.com${cartItem.image}`], // up to 8 images
+          images: [process.env.NODE_ENV === 'production' ? `${process.env.NEXT_PUBLIC_URL}${cartItem.image}` : `https://swagsticker.com${cartItem.image}`],
           metadata: {
-            // pass metadata to stripe, (productId, size, category, ...)
             ...(cartItem.product_data || {}),
           },
         },
-        unit_amount: Math.round(cartItem.price), // Convert price to cents for Stripe
+        unit_amount: Math.round(cartItem.price),
       },
       quantity: cartItem.quantity,
-      // (optional) Do not allow adjustable quantity
       adjustable_quantity: {
         enabled: false,
       },
@@ -69,7 +66,7 @@ export async function getChargesByEmail(customerEmail: string): Promise<StripeTy
     const hundredEightyDaysAgo = Math.floor(Date.now() / 1000) - 180 * 24 * 60 * 60;
     const charges: StripeType.ApiList<StripeType.Charge> = await stripe.charges.list({
       customer: customerId,
-      created: { gte: hundredEightyDaysAgo }, // Only charges from the last 180 days
+      created: { gte: hundredEightyDaysAgo },
     });
 
     return charges.data;

@@ -5,7 +5,7 @@ import logger from '@/lib/logger';
 import { sendOrderNotifEmail } from '@/lib/mailer';
 import { type Address as PrintifyAddress } from 'printify-sdk-js';
 import type { Stripe as StripeType } from 'stripe';
-import { MetadataCartItem } from '@/types';
+import { AuthenticatedHandler, MetadataCartItem } from '@/types';
 
 /**
  * @route POST /api/v1/checkout/order-confirmation
@@ -13,7 +13,7 @@ import { MetadataCartItem } from '@/types';
  * @request {Object} { "paymentIntentId": "pi_..." }
  * @response {200} { "orderId": "printify_order_id", "swagOrderId": "swag_order_id" }
  */
-export const POST = withErrorHandler(
+export const POST: AuthenticatedHandler = withErrorHandler(
   withAuthHandler(async (request: NextRequest, context, email: string) => {
     const { createDraftOrder } = await import('@/lib/printify');
     const { stripe } = await import('@/lib/stripe');
@@ -26,14 +26,12 @@ export const POST = withErrorHandler(
       throw new UserError('paymentIntentId is required');
     }
 
-    // Validate payment intent status
     const paymentIntent: StripeType.PaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
 
     if (paymentIntent.status !== 'requires_capture') {
       throw new UserError('PaymentIntent cannot be captured');
     }
 
-    // Validate email matches
     if (email !== paymentIntent.receipt_email) {
       throw new AuthError('Email does not match the PaymentIntent');
     }
@@ -56,11 +54,9 @@ export const POST = withErrorHandler(
       zip: paymentIntent.shipping?.address?.postal_code || '',
     };
 
-    // Create Printify draft order
     logger.info('[Checkout] creating draft order', { swagTraceId, swagOrderId: paymentIntent.metadata.swagOrderId });
     const { id: printifyOrderId } = await createDraftOrder(JSON.parse(paymentIntent.metadata.cartItems) as MetadataCartItem[], printifyAddress, paymentIntent.metadata.swagOrderId);
 
-    // Parallel operations - update metadata and send email
     const results = await Promise.allSettled([
       stripe.paymentIntents.update(paymentIntentId, {
         metadata: { printifyOrderId },
@@ -80,7 +76,6 @@ export const POST = withErrorHandler(
       }
     });
 
-    // Capture the payment
     logger.info('[Checkout] capturing payment', {
       swagTraceId,
       printifyOrderId,

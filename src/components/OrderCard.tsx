@@ -5,7 +5,6 @@ import { FaReceipt, FaTruck } from 'react-icons/fa6';
 import { SwagOrderDetails } from '@/types';
 import { LineItem, OrderShipment } from 'printify-sdk-js';
 
-// Skeleton Component
 const SkeletonBlock: React.FC<{ className?: string }> = ({ className = '' }) => <div className={`bg-gray-200 rounded animate-pulse ${className}`} />;
 
 export function OrderCard({ order }: { order: SwagOrderDetails }) {

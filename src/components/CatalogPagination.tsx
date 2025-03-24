@@ -6,12 +6,11 @@ import { useRouter } from 'next/navigation';
 const CatalogPagination: React.FC<{
   pageLimitIsReached?: boolean;
   catalogFilters: FilterSearchParams;
-  totalPages?: number; // Optional prop for total pages
+  totalPages?: number;
   currentPage?: number;
 }> = ({ pageLimitIsReached, catalogFilters, totalPages, currentPage }) => {
   const router = useRouter();
 
-  // Default to page 1 if invalid, ensure it's a positive integer
   const page = Math.max(1, Number(currentPage) || 1);
 
   const handlePageChange = (direction: 'prev' | 'next') => {

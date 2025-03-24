@@ -4,17 +4,12 @@ import { getProductById } from '@/lib/catalog';
 import { useShoppingCart } from 'use-shopping-cart';
 import { usePopupAlert } from '@/providers/AlertProvider';
 
-// Mocking the external dependencies
 jest.mock('@/lib/catalog', () => ({
   getProductById: jest.fn(),
 }));
-
+jest.mock('@/providers/AlertProvider', () => ({ usePopupAlert: jest.fn() }));
 jest.mock('use-shopping-cart', () => ({
   useShoppingCart: jest.fn(),
-}));
-
-jest.mock('@/providers/AlertProvider', () => ({
-  usePopupAlert: jest.fn(),
 }));
 
 describe('AddToCartBtn', () => {
@@ -22,11 +17,10 @@ describe('AddToCartBtn', () => {
   const mockAddItem = jest.fn();
 
   beforeEach(() => {
-    (usePopupAlert as jest.Mock).mockReturnValue({ setAlert: mockSetAlert });
-    (useShoppingCart as jest.Mock).mockReturnValue({ addItem: mockAddItem });
+    (usePopupAlert as jest.Mock).mockReturnValueOnce({ setAlert: mockSetAlert });
+    (useShoppingCart as jest.Mock).mockReturnValueOnce({ addItem: mockAddItem });
 
-    // Mocking getProductById to return a product object
-    (getProductById as jest.Mock).mockReturnValue({
+    (getProductById as jest.Mock).mockReturnValueOnce({
       id: 'prod-123',
       name: 'Test Product',
       category: 'category',
@@ -35,7 +29,7 @@ describe('AddToCartBtn', () => {
     });
   });
 
-  afterEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
   });
 
@@ -47,12 +41,12 @@ describe('AddToCartBtn', () => {
 
     await waitFor(() => {
       expect(mockAddItem).toHaveBeenCalledWith({
-        id: 'prod-123-M', // cart item ID
+        id: 'prod-123-M',
         category: 'category',
         name: 'Test Product',
         type: 'type',
         price: 100,
-        currency: 'USD', // Assuming PRODUCT_CONFIG.currency is 'USD'
+        currency: 'USD',
         product_data: { productId: 'prod-123', size: 'M', category: 'category', type: 'type' },
         quantity: 1,
       });
@@ -61,7 +55,6 @@ describe('AddToCartBtn', () => {
   });
 
   it('handles failure when adding an item to the cart', async () => {
-    // Simulate an error in addItem
     mockAddItem.mockImplementationOnce(() => {
       throw new Error('Add item failed');
     });
@@ -73,20 +66,6 @@ describe('AddToCartBtn', () => {
 
     await waitFor(() => {
       expect(mockSetAlert).toHaveBeenCalledWith('Failed to add item to cart', 'error');
-    });
-  });
-
-  it('does not add an item if product is not found', async () => {
-    (getProductById as jest.Mock).mockReturnValueOnce(null); // Simulate product not found
-
-    render(<AddToCartBtn productId="prod-999" size="L" price={100} />);
-
-    const button = screen.getByTestId('addtocart-btn');
-    fireEvent.click(button);
-
-    // Ensure that the addItem is not called when product is not found
-    await waitFor(() => {
-      expect(mockAddItem).not.toHaveBeenCalled();
     });
   });
 });

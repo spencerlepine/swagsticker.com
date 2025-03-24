@@ -1,8 +1,9 @@
 import { jwtVerify } from 'jose';
 import jwt from 'jsonwebtoken';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import logger from '@/lib/logger';
 import { AuthError } from '@/utils/errors';
+import { AuthenticatedHandler, RouteContext } from '@/types';
 
 const JWT_SECRET = process.env.NODE_ENV === 'test' ? 'mock-secret' : process.env.JWT_SECRET!;
 
@@ -37,23 +38,8 @@ export async function verifyAuthToken(req: NextRequest): Promise<{ email?: strin
   }
 }
 
-export function withAuthHandler(
-  handler: (
-    req: NextRequest,
-    context: {
-      params: { [key: string]: string | number };
-    },
-    email: string
-  ) => Promise<NextResponse>
-) {
-  return async (
-    req: NextRequest,
-    context: {
-      params: { [key: string]: string | number };
-    }
-  ) => {
-    const { email: extractedTokenEmail } = await verifyAuthToken(req);
-
-    return handler(req, context, extractedTokenEmail!);
+export const withAuthHandler = (handler: AuthenticatedHandler) =>
+  async (req: NextRequest, context: RouteContext) => {
+    const { email } = await verifyAuthToken(req);
+    return handler(req, context, email!);
   };
-}

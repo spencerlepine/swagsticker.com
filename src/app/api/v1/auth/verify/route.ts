@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthError, withErrorHandler } from '@/utils/errors';
 import { verifyJwt } from '@/lib/auth';
+import { RouteHandler } from '@/types';
 
 /**
  * @route GET /api/v1/auth/verify
@@ -8,7 +9,7 @@ import { verifyJwt } from '@/lib/auth';
  * @response {200} { "isAuthenticated": true }
  * @response {401} { "isAuthenticated": false, "error": "error message" }
  */
-export const GET = withErrorHandler(async (req: NextRequest) => {
+export const GET: RouteHandler = withErrorHandler(async (req: NextRequest) => {
   const token = req.cookies.get('swagAuthToken')?.value;
 
   if (!token) throw new AuthError('No token provided', 401);

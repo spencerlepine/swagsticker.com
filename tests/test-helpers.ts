@@ -1,5 +1,6 @@
+import { AuthenticatedHandler, RouteContext, RouteHandler } from '@/types';
 import { SignJWT } from 'jose';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 const swagTraceId = 'test-corr-id';
 const jwtSecret = 'mock-secret';
@@ -34,25 +35,17 @@ export function createRequest(path: string, token?: string, method: string = 'GE
 }
 
 export async function testApiResponse(
-  endpointMethod: (
-    request: NextRequest,
-    context: {
-      params: {
-        [key: string]: string | number;
-      };
-    }
-  ) => Promise<NextResponse<unknown>>,
+  endpointMethod: RouteHandler | AuthenticatedHandler,
   req: NextRequest,
-  context: { params: { [key: string]: string | number } },
+  context: RouteContext,
   expectedStatus: number,
   expectedResponse: Record<string, string | number | boolean | object | null>
 ) {
-  const response = await endpointMethod(req, context);
+  const response = await endpointMethod(req, context, 'random@email.com');
   const json = await response.json();
 
   expect(response.status).toBe(expectedStatus);
 
-  // Check each expected property
   Object.entries(expectedResponse).forEach(([key, value]) => {
     expect(json).toHaveProperty(key, value);
   });

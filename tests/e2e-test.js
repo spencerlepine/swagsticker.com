@@ -52,9 +52,8 @@ export const options = debugMode ? {
 
 async function fillInput(frame, selector, value) {
   await frame.click(selector);
-  await frame.type(selector, value, { delay: 10 }); // Add slight delay between keystrokes
+  await frame.type(selector, value, { delay: 10 });
 
-  // Wait for the input to contain the full value
   await frame.waitForFunction(
     (sel, expected) => document.querySelector(sel).value === expected,
     { timeout: 5000 },

@@ -1,17 +1,18 @@
 import { render, screen, waitFor } from '@testing-library/react';
-
 import CartNavLink from './CartNavLink';
 import { useShoppingCart } from 'use-shopping-cart';
 
 jest.mock('use-shopping-cart', () => ({
   useShoppingCart: jest.fn(),
 }));
-const mockedUseShoppingCart = useShoppingCart as jest.Mock;
 
 describe('CartBtn Component', () => {
+  beforeEach(async () => {
+    jest.clearAllMocks();
+  });
+
   it('renders the cart button with the correct cart count', async () => {
-    // Mock cartCount value
-    mockedUseShoppingCart.mockReturnValue({ cartCount: 3 });
+    (useShoppingCart as jest.Mock).mockReturnValueOnce({ cartCount: 3 });
 
     render(<CartNavLink />);
 
@@ -22,8 +23,7 @@ describe('CartBtn Component', () => {
   });
 
   it('renders the cart button with zero count if no items in cart', async () => {
-    // Mock cartCount value as 0
-    mockedUseShoppingCart.mockReturnValue({ cartCount: 0 });
+    (useShoppingCart as jest.Mock).mockReturnValueOnce({ cartCount: 0 });
 
     render(<CartNavLink />);
 

@@ -12,11 +12,9 @@ jest.mock('@/lib/printify', () => ({
 }));
 
 describe('GET /api/v1/orders/[orderId]', () => {
-  // Test constants
   const validOrderId = '123';
   const validEmail = 'test@example.com';
 
-  // Sample order data
   const mockOrder: SwagOrderDetails = {
     id: validOrderId,
     date: '2023-10-26T12:00:00Z',
@@ -61,7 +59,6 @@ describe('GET /api/v1/orders/[orderId]', () => {
     (printify.orders.getOne as jest.Mock).mockReset();
   });
 
-  // Authentication Tests
   describe('Authentication', () => {
     it('should deny access when no authentication token is provided', async () => {
       const req = createRequest(`/orders/${validOrderId}`);
@@ -81,7 +78,6 @@ describe('GET /api/v1/orders/[orderId]', () => {
     });
   });
 
-  // Success Tests
   describe('Success cases', () => {
     it('should return order details for valid request', async () => {
       const validToken = await createValidToken(validEmail);
@@ -94,7 +90,6 @@ describe('GET /api/v1/orders/[orderId]', () => {
         total_price: 24.99,
       });
 
-      // Additional assertions
       expect(json).toHaveProperty('address_to');
       expect(json).toHaveProperty('line_items');
       expect(json).toHaveProperty('total_shipping');
@@ -120,13 +115,11 @@ describe('GET /api/v1/orders/[orderId]', () => {
         total_price: 24.99,
       });
 
-      // Verify fields are filtered correctly
       expect(json).not.toHaveProperty('unnecessary_field');
       expect(json).not.toHaveProperty('internal_data');
     });
   });
 
-  // Error handling tests
   describe('Error handling', () => {
     it('should throw UserError when orderId is missing', async () => {
       const missingOrderId = '';
@@ -163,7 +156,6 @@ describe('GET /api/v1/orders/[orderId]', () => {
     });
   });
 
-  // Security tests
   describe('Security tests', () => {
     it('should reject requests with malformed orderId', async () => {
       const validToken = await createValidToken(validEmail);
@@ -181,7 +173,6 @@ describe('GET /api/v1/orders/[orderId]', () => {
       const req = createRequest(`/orders/${validOrderId}`, validToken);
       const json = await testApiResponse(getOrderEndpoint, req, { params: { orderId: validOrderId } }, 500, { error: expect.any(String) });
 
-      // Verify sensitive info is not leaked
       expect(json.error).not.toContain('user:password');
       expect(json.error).not.toContain('Database connection string');
     });
@@ -190,12 +181,10 @@ describe('GET /api/v1/orders/[orderId]', () => {
       const validToken = await createValidToken(validEmail);
 
       const req = createRequest(`/orders/${validOrderId}`, validToken);
-      // @ts-expect-error - array is not valid param
       await testApiResponse(getOrderEndpoint, req, { params: { orderId: ['123', '456'] } }, 400, { error: expect.any(String) });
     });
   });
 
-  // Performance/limits tests
   describe('Performance and limits', () => {
     it('should handle very long orderId inputs', async () => {
       const validToken = await createValidToken(validEmail);
