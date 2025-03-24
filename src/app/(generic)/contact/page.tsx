@@ -21,11 +21,10 @@ export default function ContactForm() {
               data-testid="contact-form-message-input"
               name="message"
               required
-              className="border rounded-md px-4 py-2 w-full h-24"
-            ></textarea>
+              className="border rounded-md px-4 py-2 w-full h-24"></textarea>
           </div>
           <div>
-            <input type="submit" value="Send Message" className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600" />
+            <input data-testid="contact-form-submit-btn" type="submit" value="Send Message" className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600" />
             <div aria-hidden="true">
               <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" />
             </div>

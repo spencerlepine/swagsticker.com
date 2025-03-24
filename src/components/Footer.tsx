@@ -11,7 +11,7 @@ const Footer: React.FC = () => {
 
         <ul className="flex space-x-4">
           <li>
-            <a href="/contact" className="hover:text-white">
+            <a data-testid="footer-contact-link" href="/contact" className="hover:text-white">
               Contact
             </a>
           </li>

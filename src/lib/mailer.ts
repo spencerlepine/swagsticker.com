@@ -36,18 +36,52 @@ export const sendOTPEmail = async (email: string, otp: string) => {
   await mailer.sendMail(mailOptions);
 };
 
-export const sendOrderNotifEmail = async (swagOrderId: string, printifyOrderId: string, paymentIntentId: string) => {
+export const sendOrderNotifEmail = async (swagOrderId: string, printifyOrderId: string, paymentIntentId: string, customerEmail: string) => {
   await mailer.sendMail({
     from: '"SwagSticker.com" <noreply@swagsticker.com>',
     bcc: `${process.env.NEXT_PUBLIC_CONTACT_EMAIL}`,
-    subject: `New Printify Order: ${swagOrderId}`,
-    text: `Please manually fulfill swagOrderId: ${swagOrderId}. PrintifyOrderId: ${printifyOrderId}. PaymentId: ${paymentIntentId} 
-               Visit: https://printify.com/app/store/18739212/orders/1?sort=-created_at&searchKey=Swagorderid_${swagOrderId}
-               and https://dashboard.stripe.com/test/search?query=${paymentIntentId}`,
-    html: `<p>Please manually fulfill swagOrderId: ${swagOrderId}</p>
-               <p>PrintifyOrderId: ${printifyOrderId}</p>
-               <p>PaymentId: ${paymentIntentId}</p>
-               <p>Printify: <a href="https://printify.com/app/store/18739212/orders/1?sort=-created_at&searchKey=Swagorderid_${swagOrderId}">Order Link</a></p>
-               <p>Stripe: <a href="https://dashboard.stripe.com/test/search?query=${paymentIntentId}">Payment Link</a></p>`,
+    subject: `New Swag Order: ${swagOrderId}`,
+    text: `New Order Received
+  Order Details:
+  - Swag Order ID: ${swagOrderId}
+  - Printify Order ID: ${printifyOrderId}
+  - Payment ID: ${paymentIntentId}
+  - Customer Email: ${customerEmail}
+  
+  Links:
+  - Printify: https://printify.com/app/store/18739212/orders/1?sort=-created_at&searchKey=Swagorderid_${swagOrderId}
+  - Stripe: https://dashboard.stripe.com/test/search?query=${paymentIntentId}
+  
+  Please manually fulfill this order at your earliest convenience.`,
+  
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
+        <h2 style="color: #2c3e50; border-bottom: 2px solid #eee; padding-bottom: 10px;">New Order Notification</h2>
+        
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 15px 0;">
+          <h3 style="margin: 0 0 10px 0; color: #444;">Order Details</h3>
+          <p style="margin: 5px 0;"><strong>Swag Order ID:</strong> ${swagOrderId}</p>
+          <p style="margin: 5px 0;"><strong>Printify Order ID:</strong> ${printifyOrderId}</p>
+          <p style="margin: 5px 0;"><strong>Payment ID:</strong> ${paymentIntentId}</p>
+          <p style="margin: 5px 0;"><strong>Customer:</strong> ${customerEmail}</p>
+        </div>
+  
+        <div style="margin: 15px 0;">
+          <h3 style="margin: 0 0 10px 0; color: #444;">Quick Links</h3>
+          <p style="margin: 5px 0;">
+            <a href="https://printify.com/app/store/18739212/orders/1?sort=-created_at&searchKey=Swagorderid_${swagOrderId}" 
+               style="color: #007bff; text-decoration: none;">View in Printify</a>
+          </p>
+          <p style="margin: 5px 0;">
+            <a href="https://dashboard.stripe.com/test/search?query=${paymentIntentId}" 
+               style="color: #007bff; text-decoration: none;">View in Stripe</a>
+          </p>
+        </div>
+  
+        <p style="color: #666; font-size: 14px; margin-top: 20px;">
+          Please manually fulfill this order at your earliest convenience.
+        </p>
+      </div>
+    `,
   });
 };

@@ -37,13 +37,6 @@ export const fetchProducts = (
   const { category, type, query } = filters;
 
   // 1. Filter Products
-  // let filteredProducts = STICKER_PRODUCTS.filter(product => {
-  //   // @ts-expect-error - ignore this
-  //   const categoryMatch = category === 'All' ? true : product.category === category
-  //   // @ts-expect-error - ignore this too
-  //   const typeMatch = type === 'All' ? true : product.type === type
-  //   return categoryMatch && typeMatch;
-  // });
   let filteredProducts = STICKER_PRODUCTS.filter(product => {
     let keepProduct = true;
     // @ts-expect-error - ignore this
@@ -101,6 +94,7 @@ export const fetchProducts = (
   return {
     products: paginatedProducts,
     pageLimitIsReached: pageLimitIsReached,
+    totalItems: totalCount
   };
 };
 

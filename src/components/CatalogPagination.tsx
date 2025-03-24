@@ -3,31 +3,53 @@
 import { FilterSearchParams } from '@/types';
 import { useRouter } from 'next/navigation';
 
-const CatalogPagination: React.FC<{ pageLimitIsReached?: boolean; catalogFilters: FilterSearchParams }> = ({ pageLimitIsReached, catalogFilters }) => {
+const CatalogPagination: React.FC<{
+  pageLimitIsReached?: boolean;
+  catalogFilters: FilterSearchParams;
+  totalPages?: number; // Optional prop for total pages
+  currentPage?: number;
+}> = ({ pageLimitIsReached, catalogFilters, totalPages, currentPage }) => {
   const router = useRouter();
 
-  const page = isNaN(Number(catalogFilters.page)) ? 1 : Number(catalogFilters.page);
+  // Default to page 1 if invalid, ensure it's a positive integer
+  const page = Math.max(1, Number(currentPage) || 1);
 
-  const handlePageChange = (direction: string) => {
-    const isValidPage = direction === 'prev' ? page > 1 : !pageLimitIsReached;
-    if (!isValidPage) return;
+  const handlePageChange = (direction: 'prev' | 'next') => {
+    const isPrevValid = page > 1;
+    const isNextValid = !pageLimitIsReached && (!totalPages || page < totalPages);
+
+    if ((direction === 'prev' && !isPrevValid) || (direction === 'next' && !isNextValid)) return;
 
     const nextPage = direction === 'prev' ? page - 1 : page + 1;
-
-    const existingSearchParams = { ...catalogFilters };
-    existingSearchParams.page = nextPage;
-    const updatedSearchParams = new URLSearchParams(existingSearchParams as Record<string, string>);
+    const updatedSearchParams = new URLSearchParams({
+      ...Object.fromEntries(Object.entries(catalogFilters).map(([key, value]) => [key, String(value)])),
+      page: nextPage.toString(),
+    });
 
     router.push(`/?${updatedSearchParams.toString()}`);
   };
 
   return (
-    <div className="flex justify-between w-full my-6">
-      <button onClick={() => handlePageChange('prev')} disabled={!page || page === 0} className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+    <div className="flex items-center justify-end gap-4 my-8">
+      <button
+        onClick={() => handlePageChange('prev')}
+        disabled={page === 1}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
         Previous
       </button>
 
-      <button onClick={() => handlePageChange('next')} disabled={pageLimitIsReached} className="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
+      {totalPages ? (
+        <span className="text-sm text-gray-600">
+          Page {page} of {totalPages}
+        </span>
+      ) : (
+        <span className="text-sm text-gray-600">Page {page}</span>
+      )}
+
+      <button
+        onClick={() => handlePageChange('next')}
+        disabled={!!(pageLimitIsReached || (totalPages && page >= totalPages))}
+        className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
         Next
       </button>
     </div>

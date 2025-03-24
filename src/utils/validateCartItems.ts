@@ -1,9 +1,9 @@
-import { CartItem } from '@/types';
+import { SwagCartItem } from '@/types';
 import { PRODUCT_CONFIG, STICKER_PRICES, STICKER_SIZES } from '@/lib/products';
 import { UserError } from './errors';
 import logger from '@/lib/logger';
 
-export const validateCartItems = (cartItems: CartItem[]): CartItem[] => {
+export const validateCartItems = (cartItems: SwagCartItem[]): SwagCartItem[] => {
   const ALLOWED_SIZES = Object.values(STICKER_SIZES);
   const MAX_ITEMS_ALLOWED = 50;
   const MAX_ITEM_QUANTITY = 10;
@@ -15,7 +15,7 @@ export const validateCartItems = (cartItems: CartItem[]): CartItem[] => {
     throw new UserError('Unable to process checkout request');
   }
 
-  const validCartItems: CartItem[] = [];
+  const validCartItems: SwagCartItem[] = [];
 
   for (const item of cartItems) {
     // Basic type checks
@@ -76,7 +76,7 @@ export const validateCartItems = (cartItems: CartItem[]): CartItem[] => {
     }
 
     // Construct validated item
-    const validCartItem: CartItem = {
+    const validCartItem: SwagCartItem = {
       id: item.id,
       price,
       currency: VALID_CURRENCY,

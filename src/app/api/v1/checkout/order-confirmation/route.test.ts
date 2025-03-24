@@ -134,7 +134,7 @@ describe('POST /api/v1/capture-payment', () => {
       expect(stripe.charges.update).toHaveBeenCalledWith('ch_123', {
         metadata: { cartItems: '[{"id": "prod-1", "quantity": 1}]', printifyOrderId: printifyOrderId, swagOrderId: swagOrderId },
       });
-      expect(sendOrderNotifEmail).toHaveBeenCalledWith(swagOrderId, printifyOrderId, paymentIntentId);
+      expect(sendOrderNotifEmail).toHaveBeenCalledWith(swagOrderId, printifyOrderId, paymentIntentId, validEmail);
       expect(stripe.paymentIntents.capture).toHaveBeenCalledWith(paymentIntentId);
 
       expect(json.orderId).toBe(printifyOrderId);

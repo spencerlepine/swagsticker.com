@@ -2,7 +2,7 @@ import { POST as createPaymentIntentEndpoint } from './route';
 import { stripe } from '@/lib/stripe';
 import { retrieveShippingCost } from '@/lib/printify';
 import { createExpiredToken, createRequest, createValidToken, testApiResponse } from '../../../../../../tests/test-helpers';
-import { CartItem } from '@/types';
+import { SwagCartItem } from '@/types';
 
 jest.mock('@/lib/stripe', () => ({
   stripe: {
@@ -22,7 +22,7 @@ jest.mock('@/lib/printify', () => ({
 
 describe('POST /api/v1/checkout/checkout/create-payment-intent', () => {
   const validEmail = 'test@example.com';
-  const cartItems: CartItem[] = [
+  const cartItems: SwagCartItem[] = [
     {
       id: 'asdf123',
       name: 'Product 1',

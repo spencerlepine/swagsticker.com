@@ -3,7 +3,7 @@ import { withAuthHandler } from '@/lib/auth';
 import { withErrorHandler } from '@/utils/errors';
 import validateCartItems from '@/utils/validateCartItems';
 import logger from '@/lib/logger';
-import { CartItem, MetadataCartItem } from '@/types';
+import { SwagCartItem, MetadataCartItem } from '@/types';
 
 /**
  * @route POST /api/v1/checkout/create-payment-intent
@@ -22,7 +22,7 @@ export const POST = withErrorHandler(
     const { cartItems: clientCartItems } = body;
 
     logger.info('[Checkout] Validating cart items', { swagTraceId });
-    const cartItems: CartItem[] = validateCartItems(clientCartItems);
+    const cartItems: SwagCartItem[] = validateCartItems(clientCartItems);
 
     logger.info('[Printify] calculating shipping methods', { swagTraceId });
     const shippingMethod = await retrieveShippingCost();

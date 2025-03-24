@@ -37,7 +37,7 @@ export type MetadataCartItem = {
   };
 };
 
-export type CartItem = {
+export type SwagCartItem = {
   id: string;
   /**
    * The name of the product
@@ -78,13 +78,14 @@ export interface FetchProductsFilters {
 export interface PaginatedProducts {
   products: Product[];
   pageLimitIsReached: boolean;
+  totalItems: number
 }
 
 export interface VariantShippingData {
   profiles: ShippingProfile[];
 }
 
-export interface OrderDetails {
+export interface SwagOrderDetails {
   id: string;
   date?: string;
   total?: number;

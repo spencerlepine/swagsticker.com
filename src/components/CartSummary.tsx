@@ -1,6 +1,6 @@
 'use client';
 
-import { CartItem } from '@/types';
+import { SwagCartItem } from '@/types';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 
@@ -19,7 +19,7 @@ const useMediaQuery = (query: string) => {
 };
 
 interface CartSummaryProps {
-  cartItems: CartItem[];
+  cartItems: SwagCartItem[];
   subtotal: string;
   shippingCost: string;
   orderSubtotal: string;

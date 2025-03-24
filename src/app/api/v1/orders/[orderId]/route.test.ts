@@ -1,7 +1,7 @@
 import { GET as getOrderEndpoint } from './route';
 import { printify } from '@/lib/printify';
 import { createExpiredToken, createRequest, createValidToken, testApiResponse } from '../../../../../../tests/test-helpers';
-import { OrderDetails } from '@/types';
+import { SwagOrderDetails } from '@/types';
 
 jest.mock('@/lib/printify', () => ({
   printify: {
@@ -17,7 +17,7 @@ describe('GET /api/v1/orders/[orderId]', () => {
   const validEmail = 'test@example.com';
 
   // Sample order data
-  const mockOrder: OrderDetails = {
+  const mockOrder: SwagOrderDetails = {
     id: validOrderId,
     date: '2023-10-26T12:00:00Z',
     total_price: 24.99,

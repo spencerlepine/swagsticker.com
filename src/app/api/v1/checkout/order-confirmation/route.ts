@@ -11,7 +11,7 @@ import { MetadataCartItem } from '@/types';
  * @route POST /api/v1/checkout/order-confirmation
  * @description Captures a Stripe payment intent and creates a Printify draft order. Requires authentication.
  * @request {Object} { "paymentIntentId": "pi_..." }
- * @response {200} { "orderId": "printify_order_id" }
+ * @response {200} { "orderId": "printify_order_id", "swagOrderId": "swag_order_id" }
  */
 export const POST = withErrorHandler(
   withAuthHandler(async (request: NextRequest, context, email: string) => {
@@ -44,7 +44,7 @@ export const POST = withErrorHandler(
     });
     const customer: StripeType.Customer = customers.data[0];
     const printifyAddress: PrintifyAddress = {
-      first_name: customer.name?.split(' ')[0] || '',
+      first_name: customer.name?.split(' ')[0] || email,
       last_name: customer.name?.split(' ')[1] || '',
       email: email,
       phone: paymentIntent.shipping?.phone || '',
@@ -72,7 +72,7 @@ export const POST = withErrorHandler(
           swagOrderId: paymentIntent.metadata.swagOrderId,
         },
       }),
-      sendOrderNotifEmail(paymentIntent.metadata.swagOrderId, printifyOrderId, paymentIntentId),
+      sendOrderNotifEmail(paymentIntent.metadata.swagOrderId, printifyOrderId, paymentIntentId, email),
     ]);
     results.forEach(result => {
       if (result.status === 'rejected') {
@@ -88,6 +88,6 @@ export const POST = withErrorHandler(
     });
     await stripe.paymentIntents.capture(paymentIntentId);
 
-    return NextResponse.json({ orderId: printifyOrderId }, { status: 200 });
+    return NextResponse.json({ orderId: printifyOrderId, swagOrderId: paymentIntent.metadata.swagOrderId }, { status: 200 });
   })
 );

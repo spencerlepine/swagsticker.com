@@ -3,7 +3,7 @@ import { withAuthHandler } from '@/lib/auth';
 import { type Order as PrintifyOrder } from 'printify-sdk-js';
 import { AuthError, withErrorHandler, UserError } from '@/utils/errors';
 import logger from '@/lib/logger';
-import { OrderDetails } from '@/types';
+import { SwagOrderDetails } from '@/types';
 
 /**
  * @route GET /api/v1/orders/{orderId}
@@ -34,7 +34,7 @@ export const GET = withErrorHandler(
       throw new AuthError('User not authorized for this order');
     }
 
-    const printifyOrder: OrderDetails = {
+    const printifyOrder: SwagOrderDetails = {
       id: order.id,
       status: order.status,
       shipments: order.shipments,

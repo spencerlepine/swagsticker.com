@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import CartItemCard from '@/components/CartItemCard';
 import formatPriceForDisplay from '@/utils/formatPriceForDisplay';
 import { useShoppingCart } from 'use-shopping-cart';
-import { CartItem } from '@/types';
+import { SwagCartItem } from '@/types';
 import { usePopupAlert } from '@/providers/AlertProvider';
 import { useRouter } from 'next/navigation';
 
@@ -15,7 +15,7 @@ export default function CartPage() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleRemove = (cartItem: CartItem) => {
+  const handleRemove = (cartItem: SwagCartItem) => {
     try {
       if (cartItem.quantity === 1) {
         removeItem(cartItem.id);
@@ -28,7 +28,7 @@ export default function CartPage() {
     }
   };
 
-  const handleAdd = (cartItem: CartItem) => {
+  const handleAdd = (cartItem: SwagCartItem) => {
     try {
       addItem(cartItem);
     } catch (error) {
@@ -73,36 +73,49 @@ export default function CartPage() {
 
   const subtotal = formatPriceForDisplay(totalPrice);
   return (
-    <div className="my-8 mx-20">
-      <div className="flex justify-between items-center p-4">
-        <span className="text-lg font-semibold">Subtotal: {subtotal}</span>
-        <button
-          data-testid={`checkout-btn`}
-          disabled={!cartCount || isLoading}
-          className="btn bg-green-500 text-white px-4 py-2 rounded-md focus:outline-none"
-          onClick={handleInitiateCheckout}
-        >
-          {isLoading ? 'Processing...' : 'Checkout'}
-        </button>
-      </div>
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Shopping Cart</h1>
 
-      {!cartItems ||
-        (cartItems.length === 0 && (
-          <div className="flex justify-center items-center my-32">
-            <div className="text-center text-gray-500">
-              <p className="text-xl font-bold">Cart is Empty</p>
-              <p className="text-sm">Browse the catalog and add products to your cart.</p>
-            </div>
+        {/* Summary Section */}
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6 sticky top-0 z-10">
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
+            <span className="text-lg font-semibold text-gray-900">
+              Subtotal ({cartCount} {cartCount === 1 ? 'item' : 'items'}): {subtotal}
+            </span>
+            <button
+              data-testid={`checkout-btn`}
+              disabled={!cartCount || isLoading}
+              className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+              onClick={handleInitiateCheckout}>
+              {isLoading ? 'Processing...' : 'Proceed to Checkout'}
+            </button>
           </div>
-        ))}
+        </div>
 
-      {cartItems && cartItems.length > 0 && (
-        <ul>
-          {cartItems.map(cartItem => (
-            <CartItemCard key={cartItem.id} handleRemove={() => handleRemove(cartItem as CartItem)} handleAdd={handleAdd} cartItem={cartItem as CartItem} />
+        {/* Empty Cart State */}
+        {!cartItems ||
+          (cartItems.length === 0 && (
+            <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+              <div className="text-gray-500">
+                <p className="text-xl font-semibold mb-2">Your Cart is Empty</p>
+                <p className="text-sm">Browse our catalog and add products to your cart.</p>
+                <button onClick={() => router.push('/')} className="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors duration-200">
+                  Start Shopping
+                </button>
+              </div>
+            </div>
           ))}
-        </ul>
-      )}
+
+        {/* Cart Items */}
+        {cartItems && cartItems.length > 0 && (
+          <div className="space-y-4">
+            {cartItems.map(cartItem => (
+              <CartItemCard key={cartItem.id} handleRemove={() => handleRemove(cartItem as SwagCartItem)} handleAdd={handleAdd} cartItem={cartItem as SwagCartItem} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

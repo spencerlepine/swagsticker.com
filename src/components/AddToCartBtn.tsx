@@ -3,7 +3,7 @@
 import { getProductById } from '@/lib/catalog';
 import { PRODUCT_CONFIG } from '@/lib/products';
 import { usePopupAlert } from '@/providers/AlertProvider';
-import { CartItem } from '@/types';
+import { SwagCartItem } from '@/types';
 import { useShoppingCart } from 'use-shopping-cart';
 
 const AddToCartBtn: React.FC<{ productId: string; size: string; price: number }> = ({ productId, size, price }) => {
@@ -15,7 +15,7 @@ const AddToCartBtn: React.FC<{ productId: string; size: string; price: number }>
     if (!product) return;
 
     const cartItemId = `${productId}-${size}`;
-    const cartItem: CartItem = {
+    const cartItem: SwagCartItem = {
       ...product,
       id: cartItemId,
       price: price,

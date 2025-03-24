@@ -17,6 +17,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "NEXT_TELEMETRY_DISABLED=1 NODE_ENV=production next build && npm run copy:assets",
+    "pre-commit": "npm run build && npm test && npm run docs:generate",
     "copy:assets": "cp -rn public .next/standalone && cp -rn .next/static .next/standalone/.next/static",
     "test": "jest",
     "test:watch": "jest --watch",
@@ -50,6 +51,7 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/supertest": "^6.0.2",
+    "dotenv": "^16.4.7",
     "eslint": "^8",
     "eslint-config-next": "14.2.11",
     "husky": "4.3.8",
@@ -89,7 +91,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run build && lint-staged && npm run docs:generate && npm test"
+      "pre-commit": "npm run pre-commit && lint-staged"
     }
   },
   "lint-staged": {

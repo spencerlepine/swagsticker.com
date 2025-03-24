@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { withErrorHandler } from '@/utils/errors';
+import { AuthError, UserError, withErrorHandler } from '@/utils/errors';
 import jwt from 'jsonwebtoken';
 
 const AUTH_EXPIRATION_MINS = 60;
@@ -16,14 +16,14 @@ export const POST = withErrorHandler(async (req: NextRequest) => {
   const otpToken = req.cookies.get('otpToken')?.value;
 
   if (!otpToken) {
-    throw new Error('OTP token is missing or expired');
+    throw new AuthError('OTP token is missing or expired');
   }
 
   const decoded = jwt.verify(otpToken, JWT_SECRET) as { otp: string; email: string };
   const { otp } = await req.json();
 
   if (process.env.NODE_ENV !== 'test' && decoded.otp !== otp) {
-    throw new Error('Invalid OTP, please try again');
+    throw new UserError('Invalid OTP, please try again');
   }
 
   const swagAuthToken = jwt.sign({ email: decoded.email }, JWT_SECRET, {

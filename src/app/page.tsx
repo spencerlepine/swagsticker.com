@@ -2,19 +2,19 @@ import ProductCard from '@/components/ProductCard';
 import CatalogPagination from '@/components/CatalogPagination';
 import CatalogFilters from '@/components/CatalogFilters';
 import validateSearchParams from '@/utils/validateSearchParams';
-import { fetchProducts } from '@/lib/catalog';
+import { CATALOG_CONFIG, fetchProducts } from '@/lib/catalog';
 
 export const dynamic = 'force-dynamic'; // Dynamic server-side rendering
 
 const LandingPage: React.FC<{ searchParams: { [key: string]: string | undefined } }> = ({ searchParams }) => {
   const { page: currentPage, limit, ...catalogFilters } = validateSearchParams(searchParams);
-  const { pageLimitIsReached, products } = fetchProducts(catalogFilters, currentPage, limit, catalogFilters.sortBy);
+  const { pageLimitIsReached, products, totalItems } = fetchProducts(catalogFilters, currentPage, limit, catalogFilters.sortBy);
+  const itemsPerPage = Number(limit) || CATALOG_CONFIG.defaultPerPageLimit;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
 
   return (
     <div className="my-8">
       <CatalogFilters catalogFilters={catalogFilters} />
-
-      <hr className="my-3" />
 
       {!products || products.length === 0 ? (
         <div className="flex justify-center items-center my-32">
@@ -33,7 +33,7 @@ const LandingPage: React.FC<{ searchParams: { [key: string]: string | undefined 
         </div>
       )}
 
-      {products.length > 5 && <CatalogPagination pageLimitIsReached={pageLimitIsReached} catalogFilters={catalogFilters} />}
+      {products.length > 5 && <CatalogPagination pageLimitIsReached={pageLimitIsReached} catalogFilters={catalogFilters} totalPages={totalPages} currentPage={currentPage} />}
     </div>
   );
 };

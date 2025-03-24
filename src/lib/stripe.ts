@@ -1,8 +1,8 @@
 import Stripe from 'stripe';
 import type { Stripe as StripeType } from 'stripe';
-import { CartItem } from '@/types';
+import { SwagCartItem } from '@/types';
 import logger from './logger';
-import { OrderDetails } from '@/types';
+import { SwagOrderDetails } from '@/types';
 
 // docs: https://docs.stripe.com
 // keys: https://dashboard.stripe.com/apikeys
@@ -25,7 +25,7 @@ export async function checkStripeStatus() {
   }
 }
 
-export const formatCartItemsForStripe = (cartItems: CartItem[]): Stripe.Checkout.SessionCreateParams.LineItem[] => {
+export const formatCartItemsForStripe = (cartItems: SwagCartItem[]): Stripe.Checkout.SessionCreateParams.LineItem[] => {
   return cartItems.map(cartItem => {
     const lineItem = {
       price_data: {
@@ -79,7 +79,7 @@ export async function getChargesByEmail(customerEmail: string): Promise<StripeTy
   }
 }
 
-export async function getOrdersByEmail(customerEmail: string): Promise<OrderDetails[]> {
+export async function getOrdersByEmail(customerEmail: string): Promise<SwagOrderDetails[]> {
   const charges: StripeType.Charge[] = await getChargesByEmail(customerEmail);
 
   const formattedCharges = charges.map((charge: StripeType.Charge) => ({
