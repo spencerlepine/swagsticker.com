@@ -33,19 +33,20 @@ const SearchBar = () => {
   };
 
   return (
-    <form onSubmit={handleSearch} className="w-96">
+    <form onSubmit={handleSearch} className="w-full max-w-md">
       <div className="flex bg-white rounded-md border">
         <input
           data-testid="searchbar-input"
           type="text"
+          name="search"
           placeholder="Search"
-          className="text-black rounded-md px-3 py-2 flex-grow"
+          className="text-black rounded-l-md px-3 py-2 flex-grow focus:outline-none"
           value={searchTerm}
           onChange={handleInputChange}
           onKeyDown={handlePressEnter}
         />
-        <button data-testid="searchbar-btn" className="text-white px-3 py-2 rounded-md flex items-center justify-center" type="submit" aria-label="Search">
-          <IoSearch className="text-gray-500" />
+        <button data-testid="searchbar-btn" className="text-gray-500 px-3 py-2 rounded-r-md flex items-center justify-center hover:bg-gray-100" type="submit" aria-label="Search">
+          <IoSearch />
         </button>
       </div>
     </form>
