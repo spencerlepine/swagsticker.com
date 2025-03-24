@@ -3,7 +3,7 @@ import { FaUser } from 'react-icons/fa';
 import { MdLogin } from 'react-icons/md';
 import { verifyJwt } from '@/lib/auth';
 
-const SignInBtn = () => {
+const SignInNavLink = () => {
   const cookieStore = cookies();
   const token = cookieStore.get('swagAuthToken')?.value;
   const { error } = verifyJwt(token);
@@ -31,4 +31,4 @@ const SignInBtn = () => {
   );
 };
 
-export default SignInBtn;
+export default SignInNavLink;

@@ -1,6 +1,6 @@
-import CartBtn from '@/components/CartBtn';
+import CartNavLink from '@/components/CartNavLink';
 import SearchBar from '@/components/SearchBar';
-import SignInBtn from '@/components/SignInBtn';
+import SignInNavLink from '@/components/SignInNavLink';
 
 const Header = () => {
   return (
@@ -15,9 +15,9 @@ const Header = () => {
         </div>
 
         <div className="flex items-center space-x-4 ml-auto">
-          <SignInBtn />
+          <SignInNavLink />
 
-          <CartBtn />
+          <CartNavLink />
         </div>
       </div>
     </header>

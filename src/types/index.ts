@@ -31,44 +31,22 @@ export type MetadataCartItem = {
   quantity: number;
   price: number;
   image: string;
-  product_data: {
-    size: string;
-    productId: string;
-  };
+  product_data: SwagProductData;
 };
 
 export type SwagCartItem = {
   id: string;
-  /**
-   * The name of the product
-   */
   name: string;
-  /**
-   * The description of the product
-   */
   description: string;
   quantity: number;
-  /**
-   * The price of the product
-   */
   price: number;
-  /**
-   * A URL to an image of the product
-   */
   image: string;
-  /**
-   * The currency of the product
-   */
   currency: string;
-  /**
-   * Values that go into the Stripe price_metadata field
-   */
   price_data?: object;
-  /**
-   * Values that go into the Stripe product_metadata field
-   */
-  product_data: { size: string; productId: string; category?: string; type: string };
+  product_data: SwagProductData;
 };
+
+type SwagProductData = { size: string; productId: string; category?: string; type: string };
 
 export interface FetchProductsFilters {
   category?: Category;
@@ -78,7 +56,7 @@ export interface FetchProductsFilters {
 export interface PaginatedProducts {
   products: Product[];
   pageLimitIsReached: boolean;
-  totalItems: number
+  totalItems: number;
 }
 
 export interface VariantShippingData {

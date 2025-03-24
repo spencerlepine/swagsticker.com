@@ -3,7 +3,7 @@
 import { IoMdCart } from 'react-icons/io';
 import { useShoppingCart } from 'use-shopping-cart';
 
-const CartBtn: React.FC = () => {
+const CartNavLink: React.FC = () => {
   const { cartCount } = useShoppingCart();
 
   return (
@@ -16,4 +16,4 @@ const CartBtn: React.FC = () => {
   );
 };
 
-export default CartBtn;
+export default CartNavLink;

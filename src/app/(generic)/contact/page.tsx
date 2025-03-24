@@ -1,4 +1,4 @@
-export default function ContactForm() {
+export default function ContactPage() {
   return (
     <div className="my-8 mx-20">
       <section className="container mx-auto px-4 py-8">
@@ -21,7 +21,8 @@ export default function ContactForm() {
               data-testid="contact-form-message-input"
               name="message"
               required
-              className="border rounded-md px-4 py-2 w-full h-24"></textarea>
+              className="border rounded-md px-4 py-2 w-full h-24"
+            ></textarea>
           </div>
           <div>
             <input data-testid="contact-form-submit-btn" type="submit" value="Send Message" className="bg-blue-500 text-white font-bold py-2 px-4 rounded-md hover:bg-blue-600" />

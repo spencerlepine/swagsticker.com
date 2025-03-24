@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import CartSummary from './CartSummary';
 import { loadStripe } from '@stripe/stripe-js';
 import PaymentNotice from '@/components/PaymentNotice';
+import { SwagCartItem } from '@/types';
 
 const SkeletonBlock: React.FC<{ className?: string }> = ({ className = '' }) => <div className={`bg-gray-200 rounded animate-pulse ${className}`} />;
 
@@ -116,7 +117,8 @@ function StripePaymentIframe() {
           transition-colors duration-200
           flex items-center justify-center
           focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2
-        `}>
+        `}
+      >
         {isLoading ? (
           <>
             <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -146,7 +148,7 @@ function StripePaymentIframe() {
 }
 
 interface CheckoutFormProps {
-  cartItems: [];
+  cartItems: SwagCartItem[];
   subtotal: string;
   shippingCost: string;
   orderSubtotal: string;

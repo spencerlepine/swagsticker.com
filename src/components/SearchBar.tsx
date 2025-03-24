@@ -25,7 +25,7 @@ const SearchBar = () => {
 
     const encodedTerm = encodeURIComponent(searchTerm.toLowerCase());
 
-    const existingSearchParams = Object.fromEntries(searchParams);
+    const existingSearchParams = Object.fromEntries(searchParams || {});
     existingSearchParams.query = encodedTerm; // ?query=github%20sticker
     const updatedSearchParams = new URLSearchParams(existingSearchParams);
 

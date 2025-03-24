@@ -8,6 +8,8 @@ const useMediaQuery = (query: string) => {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return; // ignore during jest tests
+
     const mediaQuery = window.matchMedia(query);
     setMatches(mediaQuery.matches);
     const handleChange = (e: MediaQueryListEvent) => setMatches(e.matches);

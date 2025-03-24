@@ -11,8 +11,7 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "jsxImportSource": "react",
+    "jsx": "react-jsx",
     "target": "es6",
     "incremental": true,
     "plugins": [
@@ -21,7 +20,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
+      "@/*": ["../src/*"],
       "@envVars": ["./envVars"]
     }
   },

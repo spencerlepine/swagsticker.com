@@ -7,10 +7,11 @@ import { useShoppingCart } from 'use-shopping-cart';
 import { SwagCartItem } from '@/types';
 import { usePopupAlert } from '@/providers/AlertProvider';
 import { useRouter } from 'next/navigation';
+import { CartEntry } from 'use-shopping-cart/core';
 
 export default function CartPage() {
   const { cartCount, cartDetails, removeItem, totalPrice, addItem, decrementItem } = useShoppingCart();
-  const cartItems = Object.values(cartDetails ?? {});
+  const cartItems: CartEntry[] = Object.values(cartDetails ?? {});
   const { setAlert } = usePopupAlert();
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
@@ -87,7 +88,8 @@ export default function CartPage() {
               data-testid={`checkout-btn`}
               disabled={!cartCount || isLoading}
               className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium px-6 py-2 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
-              onClick={handleInitiateCheckout}>
+              onClick={handleInitiateCheckout}
+            >
               {isLoading ? 'Processing...' : 'Proceed to Checkout'}
             </button>
           </div>

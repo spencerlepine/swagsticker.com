@@ -4,7 +4,7 @@ const SkeletonBlock: React.FC<{ className?: string }> = ({ className = '' }) => 
 
 export default function OrderConfirmationLoading() {
   return (
-    <div className="min-h-[600px] flex items-center justify-center px-4 sm:px-6 lg:px-8">
+    <div data-testid="loading-screen" className="min-h-[600px] flex items-center justify-center px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-md mx-auto bg-white rounded-lg shadow-md p-6">
         <div className="space-y-6">
           {/* Header */}
